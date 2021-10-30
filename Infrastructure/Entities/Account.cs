@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Infrastructure
 {
-    class Account
+    internal class Account
     {
         public int Id { get; set; }
         public Person Person { get; set; }
-        public int BalanceId { get; set; }
+        
         public List<Balance> Balances { get; set; }
+
+        [InverseProperty("AccountFrom")]
+        public List<Transaction> IncomingTransactions { get; set; }
+
+        [InverseProperty("AccountTo")]
+        public List<Transaction> OutgoingTransactions { get; set; }
+
         public DateTime CreatedAt { get; internal set; }
         public DateTime UpdatedAt { get; internal set; }
     }
 }
-
-//ContaBB
-//- Id_ContaBB
-//- Id_Pessoa
-//- UpdatedAt
-//- CreatedAt
