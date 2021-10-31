@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Domain.Shared
+namespace Domain.Entities
 {
-    class Entity
+    public abstract class Entity
     {
-        public Guid id { get; private set; }
+        public Guid Id { get; private set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

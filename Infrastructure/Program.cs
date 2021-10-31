@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Infrastructure
+﻿namespace Infrastructure
 {
     class Program
     {

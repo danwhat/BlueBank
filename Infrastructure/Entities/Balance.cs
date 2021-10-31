@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure
 {
-    class Balance
+    public class Balance
     {
         public int Id { get; set; }
         public Decimal Value { get; internal set; }

@@ -1,9 +1,8 @@
-﻿using Domain.Shared;
-using System;
+﻿using System;
 
 namespace Domain.Entities
 {
-    class Account : Entity
+    public class Account : Entity
     {
         public Person Person { get; private set; }
         public int AccountNumber { get; }

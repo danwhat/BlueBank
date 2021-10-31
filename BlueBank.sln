@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{F1A97072-1CF7-4903-ADBD-F1DCA94453BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Services", "Domain\Domain.Services.csproj", "{F1A97072-1CF7-4903-ADBD-F1DCA94453BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBank.WebAPI", "BlueBank.WebAPI\BlueBank.WebAPI.csproj", "{FFF08796-95C4-4C09-9B10-923E48BF3058}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Core", "Domain.Core\Domain.Core.csproj", "{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFF08796-95C4-4C09-9B10-923E48BF3058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFF08796-95C4-4C09-9B10-923E48BF3058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFF08796-95C4-4C09-9B10-923E48BF3058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFF08796-95C4-4C09-9B10-923E48BF3058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

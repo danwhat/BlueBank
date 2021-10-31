@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    class LegalPerson : Person
+    public class LegalPerson : Person
     {
         public string Cnpj { get; set; }
     }
