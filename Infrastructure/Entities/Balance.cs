@@ -13,6 +13,5 @@ namespace Infrastructure
         public int AccountId { get; set; }
         public Account Account { get; set; }
         public DateTime CreatedAt { get; internal set; }
-        public DateTime UpdatedAt { get; internal set; }
     }
 }

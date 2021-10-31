@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
 {
@@ -17,26 +12,14 @@ namespace Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BlueBanckDB;Trusted_Connection=true;");
-            //modelBuilder
-            //    .Entity<PromocaoProduto>()
-            //    .HasKey(pp => new { pp.PromocaoId, pp.ProdutoId });
-            //base.OnModelCreating(modelBuilder);
+            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BlueBankDB;Trusted_Connection=true;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Transaction>()
-                        .HasOne(m => m.AccountFrom)
-                        .WithMany(t => t.OutgoingTransactions)
-                        .HasForeignKey(m => m.AccountFromId)
-                        .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Transaction>()
-                        .HasOne(m => m.AccountTo)
-                        .WithMany(t => t.IncomingTransactions)
-                        .HasForeignKey(m => m.AccountToId)
-                        .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Person>()
+                .Property(person => person.Name)
+                .IsRequired();
         }
     }
 }
