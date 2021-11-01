@@ -1,6 +1,7 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BlueBank.WebAPI.Controllers
 {
@@ -15,17 +16,24 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost]
-        public OkObjectResult CreateAccount([FromBody] NewAccountDto dto)
+        public ObjectResult CreateAccount([FromBody] NewAccountDto dto)
         {
-            var request = new CreateAccountRequest();
-            if (request.Validate() == false)
+            //var dto = new NewAccountDto() { Doc = "099999", Name = "Teste" };
+            var request = new CreateAccountRequest(dto);
+            //if (request.Validate() == false)
+            //{
+            //    BadRequest();
+            //}
+            try
             {
-                BadRequest();
+                var result = request.Create();
+                return Ok(result);
             }
-
-            var result = request.Create();
-
-            return Ok(result);
+            catch(Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+            
         }
     }
 }

@@ -1,17 +1,20 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Entities;
 using Infrastructure.Repositories;
+using System;
 
 namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        //private readonly Person Person;
-
-        public CreateAccountRequest()
+        public CreateAccountRequest(NewAccountDto dto)
         {
-            //Person = new NaturalPerson() { Name = dto.Name, Cpf = dto.Doc };
+            _dto = dto;
+            _accountRepository = new AccountRepository();
         }
+
+        private readonly NewAccountDto _dto;
+        private readonly AccountRepository _accountRepository;
 
         public bool Validate()
         {
@@ -19,19 +22,56 @@ namespace Domain.Requests
             // validadoes de name
             return true;
         }
-
+        
         public NewAccountDto Create()
         {
-            // mandar repositorio da infra criar conta
-            // verificar se a pessoa existe
-            // verificar se a pessoa já tem conta
-            // se ok, criar conta
+            if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
 
-            var repository = new AccountRepository();
+            var account = new Account();
+            
+            if (isNaturalPerson())
+            {
+                NaturalPerson person = new ();
+                person.Name = _dto.Name;
+                person.Address = _dto.Address;
+                person.Cpf = _dto.Doc;
+                person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-            //var result = repository.Create(_dto);
+                account.Person = person;
+            }
+            else
+            {
+                LegalPerson person = new ();
+                person.Name = _dto.Name;
+                person.Address = _dto.Address;
+                person.Cnpj = _dto.Doc;
+                person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-            return null;
+                account.Person = person;
+            }
+            
+            Account result = _accountRepository.Create(account);
+            NewAccountDto response = new ();
+            response.AccountNumber = result.AccountNumber;
+            response.Address = result.Person.Address;
+            if (isNaturalPerson())
+            {
+                NaturalPerson pn = (NaturalPerson)result.Person;
+                response.Doc = pn.Cpf;
+            }
+            else
+            {
+                LegalPerson pn = (LegalPerson)result.Person;
+                response.Doc = pn.Cnpj;
+            }
+            response.Name = result.Person.Name;
+            response.PhoneNumber = result.Person.PhoneNumbers[0];
+            return response;
+        }
+
+        public bool isNaturalPerson()
+        {
+            return _dto.Doc.Length == 11;
         }
     }
 }
