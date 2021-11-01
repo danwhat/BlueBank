@@ -1,6 +1,7 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BlueBank.WebAPI.Controllers
 {
@@ -23,10 +24,16 @@ namespace BlueBank.WebAPI.Controllers
             //{
             //    BadRequest();
             //}
-
-            var result = request.Create(); 
-
-            return Ok(result);
+            try
+            {
+                var result = request.Create();
+                return Ok(result);
+            }
+            catch(Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+            
         }
     }
 }

@@ -25,6 +25,8 @@ namespace Domain.Requests
         
         public NewAccountDto Create()
         {
+            if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
+
             var account = new Account();
             
             if (isNaturalPerson())
