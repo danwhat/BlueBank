@@ -1,24 +1,24 @@
-﻿namespace Infrastructure
+﻿using System;
+using Infrastructure.Repositories;
+
+namespace Infrastructure
 {
     class Program
     {
         static void Main(string[] args)
         {
-            //var context = new BlueBankContext();
+            var repository = new AccountRepository();
+
             //var now = DateTime.Now;
-            //var person = new Person() { Type = 1, CreatedAt = now, UpdatedAt = now };
-            //var account = new Account() { CreatedAt = now, UpdatedAt = now, Person = person };
+            //var person = new Domain.Entities.NaturalPerson
+            //    { Name = "Alexandre", Cpf = "999999", CreatedAt = now, UpdatedAt = now };
+            //var account = new Domain.Entities.Account
+            //    { CreatedAt = now, UpdatedAt = now, Person = person };
 
-            //context.Accounts.Add(account);
+            //repository.Create(account);
+            var result = repository.GetByPersonDocs("999999");
 
-            //var account = context.Accounts.First(account => account.Id == 1);
-
-            //var transaction = new Transaction() { AccountFrom = account, AccountTo = account, Value = 1000000 };
-
-            //context.Transactions.Add(transaction);
-
-            //context.SaveChanges();
-
+            Console.WriteLine($"conta de {result.Person.Name}: conta numero {result.AccountNumber}");
 
 
         }

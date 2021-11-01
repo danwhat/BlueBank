@@ -1,4 +1,5 @@
-﻿using Domain.Core.DTOs;
+﻿using System.Linq;
+using Domain.Core.DTOs;
 using Domain.Entities;
 
 namespace Infrastructure.Repositories
@@ -11,6 +12,36 @@ namespace Infrastructure.Repositories
         {
             _context = new BlueBankContext();
         }
+
+        public Domain.Entities.Account GetByPersonDocs(string docs)
+        {
+            // validacoes
+            var person = _context.People.Where(person => person.Doc == docs).First<Person>();
+            var account = _context.Accounts.Where(account => account.PersonId == person.Id).First<Account>();
+
+            var currentBalance = account.Balances?.OrderByDescending(item => item.CreatedAt).First();
+
+            var accountEntity = new Domain.Entities.Account 
+            { AccountNumber = account.Id, Balance = (currentBalance == null) ? 0 : currentBalance.Value };
+
+            if (person.Type == 1)
+            {
+                var personEntity = new Domain.Entities.NaturalPerson
+                    { Cpf = person.Doc, Name = person.Name, Address = person.Address };
+                accountEntity.Person = personEntity;
+                return accountEntity;
+            }
+            else
+            {
+                var personEntity = new Domain.Entities.LegalPerson
+                    { Cnpj = person.Doc, Name = person.Name, Address = person.Address };
+                accountEntity.Person = personEntity;
+                return accountEntity;
+            }
+
+        }
+        //public Domain.Entities.Account GetByPersonId()
+        //public Domain.Entities.Account GetByPersonName()
         public Domain.Entities.Account Create(Domain.Entities.Account account)
         {
             // tipo = 1 pf 2 pj

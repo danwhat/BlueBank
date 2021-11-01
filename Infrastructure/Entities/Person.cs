@@ -7,6 +7,7 @@ namespace Infrastructure
 
         public int Id { get; set; }
         public string Name { get; internal set; }
+        public string Address { get; internal set; }
         public int Type { get; internal set; }
         public string Doc { get; internal set; }
         public Account Account { get; set; }

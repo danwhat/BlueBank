@@ -6,13 +6,11 @@ namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        private readonly Person Person;
-        private readonly Account account;
+        //private readonly Person Person;
 
-        public CreateAccountRequest(NewAccountDto dto)
+        public CreateAccountRequest()
         {
-            Person = new NaturalPerson() { Name = dto.Name, Cpf = dto.Doc };
-            Account = new Account() { Person = this.Person };
+            //Person = new NaturalPerson() { Name = dto.Name, Cpf = dto.Doc };
         }
 
         public bool Validate()
@@ -31,9 +29,9 @@ namespace Domain.Requests
 
             var repository = new AccountRepository();
 
-            var result = repository.Create(_dto);
+            //var result = repository.Create(_dto);
 
-            return result;
+            return null;
         }
     }
 }
