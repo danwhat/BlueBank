@@ -54,16 +54,7 @@ namespace Domain.Requests
             NewAccountDto response = new ();
             response.AccountNumber = result.AccountNumber;
             response.Address = result.Person.Address;
-            if (isNaturalPerson())
-            {
-                NaturalPerson pn = (NaturalPerson)result.Person;
-                response.Doc = pn.Cpf;
-            }
-            else
-            {
-                LegalPerson pn = (LegalPerson)result.Person;
-                response.Doc = pn.Cnpj;
-            }
+            response.Doc = result.Person.Doc;
             response.Name = result.Person.Name;
             response.PhoneNumber = result.Person.PhoneNumbers[0];
             return response;
