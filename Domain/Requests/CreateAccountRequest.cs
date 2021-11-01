@@ -1,15 +1,18 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Entities;
 using Infrastructure.Repositories;
 
 namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        private readonly NewAccountDto _dto;
+        private readonly Person Person;
+        private readonly Account account;
 
         public CreateAccountRequest(NewAccountDto dto)
         {
-            _dto = dto;
+            Person = new NaturalPerson() { Name = dto.Name, Cpf = dto.Doc };
+            Account = new Account() { Person = this.Person };
         }
 
         public bool Validate()

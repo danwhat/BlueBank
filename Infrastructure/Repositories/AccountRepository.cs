@@ -1,4 +1,5 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Entities;
 
 namespace Infrastructure.Repositories
 {
@@ -10,15 +11,58 @@ namespace Infrastructure.Repositories
         {
             _context = new BlueBankContext();
         }
-        public NewAccountDto Create(NewAccountDto dto)
+        public Domain.Entities.Account Create(Domain.Entities.Account account)
         {
-            var person = new Person() { Doc = dto.Doc, Name = dto.Name, Type = 1 };
-            var account = new Account() { Person = person };
+            // tipo = 1 pf 2 pj
+            string docs = "";
+            int type = 0;
 
-            var result = _context.Accounts.Add(account);
-            _context.SaveChanges();
+            if (account.Person.GetType() == typeof(NaturalPerson))
+            {
+                var getPerson = (NaturalPerson)account.Person;
+                docs = getPerson.Cpf;
+                type = 1;
+            } 
+            else if (account.Person.GetType() == typeof(LegalPerson))
+            {
+                var getPerson = (LegalPerson)account.Person;
+                docs = getPerson.Cnpj;
+                type = 2;
+            }
 
-            return new NewAccountDto() { Doc = dto.Doc, Name = dto.Name, AccountNumber = account.Id };
+            if (type > 0)
+            {
+                if (account.Person.Id > 0)
+                {
+                    var dbPerson = new Person() { Name = account.Person.Name, Doc = docs, Type = type, Id = account.Person.Id };
+                    var dbAccount = new Account() { Person = dbPerson };
+                    var result = _context.Accounts.Add(dbAccount);
+
+                    _context.SaveChanges();
+
+                    account.AccountNumber = dbAccount.Id;
+
+                    return account;
+                }
+                else
+                {
+                    var dbPerson = new Person() { Name = account.Person.Name, Doc = docs, Type = type };
+                    var dbAccount = new Account() { Person = dbPerson };
+                    
+                    _context.People.Add(dbPerson);
+                    _context.Accounts.Add(dbAccount);
+
+                    _context.SaveChanges();
+
+                    account.AccountNumber = dbAccount.Id;
+                    // account.Person.Id = dbPerson.Id; LEMBRAR SE O SERVICES PRECISA DO ID DE CLIENTE NOVO CRIADO
+
+                    return account;
+                }
+            }
+
+            return null;
+
         }
     }
 }

@@ -17,7 +17,6 @@ namespace BlueBank.WebAPI.Controllers
         [HttpPost]
         public OkObjectResult CreateAccount([FromBody] NewAccountDto dto)
         {
-            //var dto = new NewAccountDto() { Doc = "099999", Name = "Teste" };
             var request = new CreateAccountRequest(dto);
             if (request.Validate() == false)
             {
