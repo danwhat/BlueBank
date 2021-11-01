@@ -8,6 +8,16 @@ namespace Domain.Entities
 {
     public class NaturalPerson : Person
     {
-        public string Cpf { get; set; }
+        public string Cpf
+        {
+            get
+            {
+                return base.Doc;
+            }
+            set
+            {
+                base.Doc = value;
+            }
+        }
     }
 }

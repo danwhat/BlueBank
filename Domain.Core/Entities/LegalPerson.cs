@@ -8,7 +8,16 @@ namespace Domain.Entities
 {
     public class LegalPerson : Person
     {
-        public string Cnpj { get; set; }
+        public string Cnpj {
+            get
+            {
+                return base.Doc;
+            }
+            set
+            {
+                base.Doc = value;
+            }
+        }
     }
 }
  
