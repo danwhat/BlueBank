@@ -9,8 +9,7 @@ namespace Domain.Core.Interfaces
 {
     interface IPersonRepository
     {
-        public Person Update(Person acc);
-        public Account Read(int AccountNumber);
-        public bool Delete(Account acc);
+        public Person Update(Person person);
+        public Person Read(string doc);
     }
 }
