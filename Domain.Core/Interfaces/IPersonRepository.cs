@@ -10,6 +10,9 @@ namespace Domain.Core.Interfaces
     interface IPersonRepository
     {
         public Person Update(Person person);
-        public Person Read(string doc);
+        public Person Get(string doc);
+        public Person UpdateContactList(string doc, List<string> list);
+        public Person RemoveContact(string doc, string phoneNumber);
+        public Person AddContact(string doc, string phoneNumber);
     }
 }
