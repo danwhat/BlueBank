@@ -10,9 +10,9 @@ namespace BlueBank.WebAPI.Controllers
     public class AccountController : ControllerBase
     {
         [HttpGet]
-        public string Get()
+        public int Get([FromRoute] int accountNumber)
         {
-            return "Olá mundo!";
+            return accountNumber;
         }
 
         [HttpPost]
