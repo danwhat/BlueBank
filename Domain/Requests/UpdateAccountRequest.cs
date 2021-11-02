@@ -21,7 +21,6 @@ namespace Domain.Requests
             // valida se a conta existe
             Account acc = _accountRepository.Read(_dto.AccountNumber);
             if (acc != null) return false;
-
             return true;
         }
         
@@ -54,7 +53,7 @@ namespace Domain.Requests
             
             Account updatedAccount = _accountRepository.Update(account);
             AccountDto response = new (updatedAccount);
-            return response;
+            return new AccountDto();
         }
 
         public bool isNaturalPerson()
