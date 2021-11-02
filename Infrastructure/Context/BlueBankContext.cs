@@ -2,7 +2,7 @@
 
 namespace Infrastructure
 {
-    internal class BlueBankContext : DbContext
+    public class BlueBankContext : DbContext
     {
         internal DbSet<Person> People { get; set; }
         internal DbSet<Contact> Contacts { get; set; }
@@ -20,6 +20,17 @@ namespace Infrastructure
             modelBuilder.Entity<Person>()
                 .Property(person => person.Name)
                 .IsRequired();
+            modelBuilder.Entity<Person>()
+                .HasIndex(person => new { person.Doc })
+                .IsUnique();
+
+            modelBuilder.Entity<Person>()
+                .Property(person => person.isActive)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<Account>()
+                .Property(account => account.IsActive)
+                .HasDefaultValue(true);
         }
     }
 }

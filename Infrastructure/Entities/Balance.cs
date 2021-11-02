@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Infrastructure.Entities;
 
 namespace Infrastructure
 {
-    public class Balance
+    internal class Balance : EntityBase
     {
-        public int Id { get; set; }
         public Decimal Value { get; internal set; }
         public int AccountId { get; set; }
         public Account Account { get; set; }

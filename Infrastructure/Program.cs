@@ -7,18 +7,20 @@ namespace Infrastructure
     {
         static void Main(string[] args)
         {
-            var repository = new AccountRepository();
+            var context = new BlueBankContext();
+            var peopleRepository = new PeopleRepository(context);
+            var accountRepository = new AccountRepository(context);
 
-            //var now = DateTime.Now;
-            //var person = new Domain.Entities.NaturalPerson
-            //    { Name = "Alexandre", Cpf = "999999", CreatedAt = now, UpdatedAt = now };
-            //var account = new Domain.Entities.Account
-            //    { CreatedAt = now, UpdatedAt = now, Person = person };
+            var now = DateTime.Now;
+            var person = new Domain.Entities.NaturalPerson
+            { Name = "Alexandre Leite", Cpf = "456", Address = "Rua da Vila Xp", CreatedAt = now, UpdatedAt = now };
 
-            //repository.Create(account);
-            var result = repository.GetByPersonDocs("999999");
+            var result = peopleRepository.Create(person);
+            //peopleRepository.AddContact(result, "aloooooou767676");
+            //var updated = peopleRepository.GetByDoc("456");
 
-            Console.WriteLine($"conta de {result.Person.Name}: conta numero {result.AccountNumber}");
+            Console.WriteLine($"Doc de {result.Name} é {result.Doc}");
+            //Console.WriteLine(updated.PhoneNumbers);
 
 
         }

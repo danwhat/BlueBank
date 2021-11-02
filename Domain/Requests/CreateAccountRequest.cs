@@ -1,16 +1,17 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
 using Domain.Entities;
+using Infrastructure;
 using Infrastructure.Repositories;
-using System;
 
 namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        public CreateAccountRequest(NewAccountDto dto)
+        public CreateAccountRequest(NewAccountDto dto, BlueBankContext context)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository();
+            _accountRepository = new AccountRepository(context);
         }
 
         private readonly NewAccountDto _dto;

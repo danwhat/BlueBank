@@ -29,6 +29,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
@@ -106,7 +111,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Doc")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -118,7 +123,16 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("isActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Doc")
+                        .IsUnique()
+                        .HasFilter("[Doc] IS NOT NULL");
 
                     b.ToTable("People");
                 });
@@ -176,7 +190,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Contact", b =>
                 {
                     b.HasOne("Infrastructure.Person", "Person")
-                        .WithMany()
+                        .WithMany("Contacts")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -207,6 +221,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Person", b =>
                 {
                     b.Navigation("Account");
+
+                    b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
-﻿using System.Linq;
-using Domain.Core.DTOs;
+﻿using System;
+using System.Linq;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -8,21 +9,31 @@ namespace Infrastructure.Repositories
     {
         private readonly BlueBankContext _context;
 
-        public AccountRepository()
+        public AccountRepository(BlueBankContext context)
         {
-            _context = new BlueBankContext();
+            _context = context;
         }
 
-        public Domain.Entities.Account GetByPersonDocs(string docs)
+        public Domain.Entities.Account GetByPersonDoc(string docs)
         {
             // validacoes
-            var person = _context.People.Where(person => person.Doc == docs).First<Person>();
-            var account = _context.Accounts.Where(account => account.PersonId == person.Id).First<Account>();
+            var person = _context.People
+                .Where(person => person.Doc == docs && person.isActive == true)
+                .FirstOrDefault<Person>();
+            if (person == null) throw new Exception();
+
+            var account = _context.Accounts
+                .Where(account => account.PersonId == person.Id && account.IsActive == true)
+                .FirstOrDefault<Account>();
+            if (account == null) return null;
 
             var currentBalance = account.Balances?.OrderByDescending(item => item.CreatedAt).First();
 
             var accountEntity = new Domain.Entities.Account 
-            { AccountNumber = account.Id, Balance = (currentBalance == null) ? 0 : currentBalance.Value };
+            { 
+                AccountNumber = account.Id,
+                Balance = (currentBalance == null) ? 0 : currentBalance.Value
+            };
 
             if (person.Type == 1)
             {
@@ -42,58 +53,100 @@ namespace Infrastructure.Repositories
         }
         //public Domain.Entities.Account GetByPersonId()
         //public Domain.Entities.Account GetByPersonName()
+        
         public Domain.Entities.Account Create(Domain.Entities.Account account)
         {
-            // tipo = 1 pf 2 pj
-            string docs = "";
-            int type = 0;
+            int personType = 0;
+            if (account.Person.GetType() == typeof(NaturalPerson)) personType = 1;
+            if (account.Person.GetType() == typeof(LegalPerson)) personType = 2;
+            if (personType == 0) return null;
 
-            if (account.Person.GetType() == typeof(NaturalPerson))
+            var dbPerson = _context.People
+                .Where(person => person.Doc == account.Person.Doc && person.isActive == true)
+                .FirstOrDefault<Person>();
+            if (dbPerson == null)
             {
-                var getPerson = (NaturalPerson)account.Person;
-                docs = getPerson.Cpf;
-                type = 1;
-            } 
-            else if (account.Person.GetType() == typeof(LegalPerson))
+                dbPerson = new Person
+                {
+                    Doc = account.Person.Doc,
+                    Name = account.Person.Name,
+                    Address = account.Person.Address,
+                    Type = personType,
+                    CreatedAt = DateTime.Now,
+                };
+            }
+            
+            if (dbPerson.isActive == false) dbPerson.isActive = true;
+            dbPerson.UpdatedAt = DateTime.Now;
+            
+            var dbAccount = new Account() { 
+                Person = dbPerson,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+            };
+
+            try
             {
-                var getPerson = (LegalPerson)account.Person;
-                docs = getPerson.Cnpj;
-                type = 2;
+                _context.Accounts.Add(dbAccount);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                Console.WriteLine("Cliente já tem conta!");
             }
 
-            if (type > 0)
+            account.AccountNumber = dbAccount.Id;
+            return account;
+        }
+
+        public void Remove(Domain.Entities.Account account)
+        {
+            var dbPerson = _context.People
+                .Where(person => person.Doc == account.Person.Doc && person.isActive == true)
+                .FirstOrDefault<Person>();
+            if (dbPerson == null) throw new Exception();
+
+            var dbAccount = _context.Accounts
+                .Where(curr => curr.PersonId == dbPerson.Id && curr.IsActive == true)
+                .FirstOrDefault<Account>();
+            if (dbAccount == null) throw new Exception();
+
+            dbAccount.IsActive = false;
+
+            try
             {
-                if (account.Person.Id > 0)
-                {
-                    var dbPerson = new Person() { Name = account.Person.Name, Doc = docs, Type = type, Id = account.Person.Id };
-                    var dbAccount = new Account() { Person = dbPerson };
-                    var result = _context.Accounts.Add(dbAccount);
-
-                    _context.SaveChanges();
-
-                    account.AccountNumber = dbAccount.Id;
-
-                    return account;
-                }
-                else
-                {
-                    var dbPerson = new Person() { Name = account.Person.Name, Doc = docs, Type = type };
-                    var dbAccount = new Account() { Person = dbPerson };
-                    
-                    _context.People.Add(dbPerson);
-                    _context.Accounts.Add(dbAccount);
-
-                    _context.SaveChanges();
-
-                    account.AccountNumber = dbAccount.Id;
-                    // account.Person.Id = dbPerson.Id; LEMBRAR SE O SERVICES PRECISA DO ID DE CLIENTE NOVO CRIADO
-
-                    return account;
-                }
+                _context.Accounts.Update(dbAccount);
+                _context.SaveChanges();
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
-            return null;
+        public void Remove(string docs)
+        {
+            var dbPerson = _context.People
+                .Where(person => person.Doc == docs && person.isActive == true)
+                .FirstOrDefault<Person>();
+            if (dbPerson == null) throw new Exception();
 
+            var dbAccount = _context.Accounts
+                .Where(curr => curr.PersonId == dbPerson.Id && curr.IsActive == true)
+                .FirstOrDefault<Account>();
+            if (dbAccount == null) throw new Exception();
+
+            dbAccount.IsActive = false;
+
+            try
+            {
+                _context.Accounts.Update(dbAccount);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

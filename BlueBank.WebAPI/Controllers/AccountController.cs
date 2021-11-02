@@ -16,20 +16,21 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost]
-        public ObjectResult CreateAccount([FromBody] NewAccountDto dto)
+        public IActionResult CreateAccount([FromBody] NewAccountDto dto)
         {
             //var dto = new NewAccountDto() { Doc = "099999", Name = "Teste" };
-            var request = new CreateAccountRequest(dto);
+            //var request = new CreateAccountRequest(dto);
             //if (request.Validate() == false)
             //{
             //    BadRequest();
             //}
             try
             {
-                var result = request.Create();
-                return Ok(result);
+                //var result = request.Create();
+                //return Ok(result);
+                return Ok();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest("Mensagem de erro:" + e.Message);
             }
