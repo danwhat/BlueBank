@@ -5,9 +5,9 @@ using System;
 
 namespace Domain.Requests
 {
-    public class WithdrawRequest
+    public class TransferRequest
     {
-        public WithdrawRequest(int AccountNumber, TransactionDTO dto)
+        public TransferRequest(int AccountNumber, TransactionDTO dto)
         {
             _accountNumber = AccountNumber;
             _dto = dto;
@@ -22,23 +22,28 @@ namespace Domain.Requests
 
         public bool Validate()
         {
-            Account acc = _accountRepository.Get(_accountNumber);
-            // valida se a conta existe
-            if (acc == null) return false;
+            Account accFrom = _accountRepository.Get(_accountNumber);
+            Account accTo = _accountRepository.Get(_dto.AccountNumberTo);
+            // valida se a conta origem existe
+            if (accFrom == null) return false;
+            // valida se a conta destino existe
+            if (accTo == null) return false;
             // Checar se tem saldo
-            if (_dto.Value > acc.Balance) return false;
+            if (_dto.Value > accFrom.Balance) return false;
             // validado
             return true;
         }
         
-        public TransactionResponseDTO Withdraw()
+        public TransactionResponseDTO Transfer()
         {
             if (!Validate()) throw new Exception("Não passou na validação");
 
-            Account acc = _accountRepository.Get(_accountNumber);
+            Account accFrom = _accountRepository.Get(_accountNumber);
+            Account accTo = _accountRepository.Get(_dto.AccountNumberTo);
 
             Transaction transaction = new();
-            transaction.AccountFrom = acc;
+            transaction.AccountFrom = accFrom;
+            transaction.AccountTo = accTo;
             transaction.Value = _dto.Value;
 
             try
@@ -46,14 +51,14 @@ namespace Domain.Requests
                 Transaction transactionDB = _transactionRepositoy.Create(transaction);
                 Account accAtualizada = _accountRepository.Get(_accountNumber);
                 var transactionResponse = new TransactionResponseDTO();
-                transactionResponse.Message = "Saque realizado com sucesso.";
-                transactionResponse.OldBalance = acc.Balance;
+                transactionResponse.Message = $"Transferencia para {accTo.Person.Name} realizado com sucesso.";
+                transactionResponse.OldBalance = accFrom.Balance;
                 transactionResponse.CurrentBalance = accAtualizada.Balance;
                 return transactionResponse;
             }
             catch(Exception e)
             {
-                throw new Exception("Deu erro aqui.");
+                throw new Exception($"Falha de comunicação com o Repository: {e.Message}");
             }
         }
     }
