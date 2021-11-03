@@ -1,5 +1,6 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Requests;
+using Domain.Services.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -55,30 +56,5 @@ namespace BlueBank.WebAPI.Controllers
         //        return BadRequest("Mensagem de erro:" + e.Message);
         //    }
         //}
-            try
-            {
-                var result = request.Delete();
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("Mensagem de erro:" + e.Message);
-            }
-        }
-
-        [HttpPost("{accountNumber}")]
-        public ObjectResult CreateContact(int accountNumber, [FromBody] PersonRequestDto phone)
-        {
-            try
-            {
-                var request = new CreateContactRequest(accountNumber, phone);
-                var result = request.Create();
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("Mensagem de erro:" + e.Message);
-            }
-        }
     }    
 }

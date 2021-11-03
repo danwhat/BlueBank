@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Requests
+namespace Domain.Services.Requests
 {
     public class CreateContactRequest
     {
