@@ -22,19 +22,18 @@ namespace Domain.Requests
 
         public bool Validate()
         {
-            // valida se a conta existe
             Account acc = _accountRepository.Get(_accountNumber);
-            if (acc != null) return false;
+            // valida se a conta existe
+            if (acc == null) return false;
             // Checar se tem saldo
-            var accdb = _accountRepository.Get(_accountNumber);
-            if (_dto.Value > accdb.Balance) return false;
+            if (_dto.Value > acc.Balance) return false;
             // validado
             return true;
         }
         
-        public AccountDto Withdraw()
+        public TransactionResponseDTO Withdraw()
         {
-            if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
+            if (!Validate()) throw new Exception("Não passou na validação");
 
             Account acc = _accountRepository.Get(_accountNumber);
 
@@ -42,9 +41,20 @@ namespace Domain.Requests
             transaction.AccountFrom = acc;
             transaction.Value = _dto.Value;
 
-            Transaction transactionDB = _transactionRepositoy.Create(transaction);
-
+            try
+            {
+                Transaction transactionDB = _transactionRepositoy.Create(transaction);
+                Account accAtualizada = _accountRepository.Get(_accountNumber);
+                var transactionResponse = new TransactionResponseDTO();
+                transactionResponse.Message = "Saque realizado com sucesso.";
+                transactionResponse.OldBalance = acc.Balance;
+                transactionResponse.CurrentBalance = accAtualizada.Balance;
+                return transactionResponse;
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Deu erro aqui.");
+            }
         }
-
     }
 }

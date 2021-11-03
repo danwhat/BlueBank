@@ -9,7 +9,7 @@ namespace BlueBank.WebAPI.Controllers
     [Route("[controller]")]
     public class WithdrawController : ControllerBase
     {
-        [HttpGet("{accountNumber}")]
+        [HttpPost("{accountNumber}")]
         public ObjectResult Withdraw(int accountNumber, [FromBody] TransactionDTO transation)
         {
             try
