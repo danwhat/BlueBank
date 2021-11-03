@@ -11,7 +11,7 @@ namespace Domain.Requests
         public CreateAccountRequest(AccountDto dto)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository(context);
+            //_accountRepository = new AccountRepository(context);
         }
 
         private readonly AccountDto _dto;

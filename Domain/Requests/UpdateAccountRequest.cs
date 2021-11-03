@@ -10,17 +10,17 @@ namespace Domain.Requests
         public UpdateAccountRequest(AccountDto dto)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository();
+            //_accountRepository = new AccountRepository();
         }
 
         private readonly AccountDto _dto;
-        private readonly AccountRepository _accountRepository;
+        //private readonly AccountRepository _accountRepository;
 
         public bool Validate()
         {
             // valida se a conta existe
-            Account acc = _accountRepository.Read(_dto.AccountNumber);
-            if (acc != null) return false;
+            //Account acc = _accountRepository.Read(_dto.AccountNumber);
+            //if (acc != null) return false;
             return true;
         }
         
@@ -51,8 +51,8 @@ namespace Domain.Requests
                 account.Person = person;
             }
             
-            Account updatedAccount = _accountRepository.Update(account);
-            AccountDto response = new (updatedAccount);
+            //Account updatedAccount = _accountRepository.Update(account);
+            //AccountDto response = new (updatedAccount);
             return new AccountDto();
         }
 

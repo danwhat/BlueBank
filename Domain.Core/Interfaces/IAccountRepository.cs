@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Interfaces
 {
-    interface IAccountRepository
+    public interface IAccountRepository
     {
         public Account Create(Account acc);
         public Account Get(int accountNumber);

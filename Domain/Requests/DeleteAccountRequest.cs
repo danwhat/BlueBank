@@ -17,13 +17,13 @@ namespace Domain.Requests
         public DeleteAccountRequest(int accountNumber)
         {
             _accountNumber = accountNumber;
-            _accountRepository = new AccountRepository();
+            //_accountRepository = new AccountRepository();
         }
 
         public bool Validate()
         {
-            Account acc = _accountRepository.Read(_dto.AccountNumber);
-            if (acc != null) return false;
+            //Account acc = _accountRepository.Read(_dto.AccountNumber);
+            //if (acc != null) return false;
             return true;
         }
 
@@ -31,14 +31,14 @@ namespace Domain.Requests
         {
             if (!Validate()) throw new Exception("Erro ao deletar conta.");
 
-            var account = new Infrastructure.Account();
+            //var account = new Infrastructure.Account();
 
             // var findAccount = _context.Accounts.SingleOrDefault(x => x.Id == account);
 
-            bool result = _accountRepository.Delete(account);
+            //bool result = _accountRepository.Delete(account);
             // int response = new();
 
-            return result;
+            return true;
         }
     }
 }
