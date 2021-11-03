@@ -10,9 +10,18 @@ namespace BlueBank.WebAPI.Controllers
     public class WithdrawController : ControllerBase
     {
         [HttpGet("{accountNumber}")]
-        public ObjectResult Withdraw(string accountNumber, [FromBody] TransactionDTO transation)
+        public ObjectResult Withdraw(int accountNumber, [FromBody] TransactionDTO transation)
         {
-            return Ok($"Conta: {accountNumber}, Valor sacado: {transation.Value}");
+            try
+            {
+                var request = new WithdrawRequest(accountNumber, transation);
+                var response = request.Withdraw();
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
         }
     }
 }

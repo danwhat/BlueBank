@@ -7,19 +7,28 @@ namespace Domain.Requests
 {
     public class WithdrawRequest
     {
-        public WithdrawRequest(TransactionDTO dto)
+        public WithdrawRequest(int AccountNumber, TransactionDTO dto)
         {
+            _accountNumber = AccountNumber;
             _dto = dto;
             _accountRepository = new AccountRepository();
+            _transactionRepositoy = new TransactionRepository();
         }
 
+        private readonly int _accountNumber;
         private readonly TransactionDTO _dto;
-        private readonly BalanceRepository _accountRepository;
+        private readonly AccountRepository _accountRepository;
+        private readonly TransactionRepository _transactionRepositoy;
 
         public bool Validate()
         {
-            // Checar se conta existe
+            // valida se a conta existe
+            Account acc = _accountRepository.Get(_accountNumber);
+            if (acc != null) return false;
             // Checar se tem saldo
+            var accdb = _accountRepository.Get(_accountNumber);
+            if (_dto.Value > accdb.Balance) return false;
+            // validado
             return true;
         }
         
@@ -27,11 +36,14 @@ namespace Domain.Requests
         {
             if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
 
-            
+            Account acc = _accountRepository.Get(_accountNumber);
 
-            Account newAccount = _accountRepository.Create(account);
-            AccountDto response = new(newAccount);
-            return response;
+            Transaction transaction = new();
+            transaction.AccountFrom = acc;
+            transaction.Value = _dto.Value;
+
+            Transaction transactionDB = _transactionRepositoy.Create(transaction);
+
         }
 
     }
