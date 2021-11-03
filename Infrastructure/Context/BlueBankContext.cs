@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
 {
-    internal class BlueBankContext : DbContext
+    public class BlueBankContext : DbContext
     {
         internal DbSet<Person> People { get; set; }
         internal DbSet<Contact> Contacts { get; set; }
@@ -20,6 +21,36 @@ namespace Infrastructure
             modelBuilder.Entity<Person>()
                 .Property(person => person.Name)
                 .IsRequired();
+            modelBuilder.Entity<Person>()
+                .HasIndex(person => new { person.Doc })
+                .IsUnique();
+            modelBuilder.Entity<Person>()
+                .Property(person => person.IsActive)
+                .HasDefaultValue(true);
+            modelBuilder.Entity<Person>()
+                .Property(person => person.CreatedAt)
+                .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Person>()
+                .Property(person => person.UpdatedAt)
+                .HasDefaultValue(DateTime.Now);
+
+            modelBuilder.Entity<Account>()
+                .Property(account => account.IsActive)
+                .HasDefaultValue(true);
+            modelBuilder.Entity<Account>()
+                .Property(account => account.CreatedAt)
+                .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Account>()
+                .Property(account => account.UpdatedAt)
+                .HasDefaultValue(DateTime.Now);
+
+            modelBuilder.Entity<Contact>()
+                .Property(contact => contact.CreatedAt)
+                .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Contact>()
+                .HasOne<Person>(contact => contact.Person)
+                .WithMany(person => person.Contacts)
+                .HasForeignKey(contact => contact.PersonId);
         }
     }
 }

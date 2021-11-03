@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using Infrastructure.Entities;
 
 namespace Infrastructure
 {
-    public class Person
+    internal class Person : EntityBase
     {
-
-        public int Id { get; set; }
         public string Name { get; internal set; }
         public string Address { get; internal set; }
         public int Type { get; internal set; }
         public string Doc { get; internal set; }
-        public Account Account { get; set; }
+        public ICollection<Account> Account { get; set; }
+        public ICollection<Contact> Contacts { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public DateTime UpdatedAt { get; internal set; }
+        public bool IsActive { get; set; }
+
     }
 }

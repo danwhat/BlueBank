@@ -10,11 +10,11 @@ namespace Domain.Requests
         public UpdateAccountRequest(AccountDto dto)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository();
+            //_accountRepository = new AccountRepository();
         }
 
         private readonly AccountDto _dto;
-        private readonly AccountRepository _accountRepository;
+        //private readonly AccountRepository _accountRepository;
 
         public bool Validate()
         {
@@ -51,8 +51,8 @@ namespace Domain.Requests
                 account.Person = person;
             }
             
-            Account updatedAccount = _accountRepository.Update(account);
-            AccountDto response = new (updatedAccount);
+            //Account updatedAccount = _accountRepository.Update(account);
+            //AccountDto response = new (updatedAccount);
             return new AccountDto();
         }
 
