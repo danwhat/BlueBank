@@ -13,18 +13,18 @@ namespace Domain.Requests
     {
         private readonly string _phoneNumber;
         private readonly string _doc;
-        private readonly ContactRepository _contactRepository;
+        private readonly PersonRepository _personRepository;
 
         public DeleteContactRequest(string doc, string phoneNumber)
         {
             _phoneNumber = phoneNumber;
             _doc = doc;
-            _contactRepository = new ContactRepository();
+            _personRepository = new PersonRepository();
         }
 
         public Person Delete()
         {
-            Person result = _contactRepository.RemoveContact(_doc, _phoneNumber);
+            Person result = _personRepository.RemoveContact(_doc, _phoneNumber);
             return result;
         }
     }
