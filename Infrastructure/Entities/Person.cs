@@ -14,7 +14,7 @@ namespace Infrastructure
         public List<Contact> Contacts { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public DateTime UpdatedAt { get; internal set; }
-        public bool isActive { get; set; }
+        public bool IsActive { get; set; }
 
     }
 }
