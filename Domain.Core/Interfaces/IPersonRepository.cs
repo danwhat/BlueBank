@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Interfaces
 {
-    interface IPersonRepository
+    public interface IPersonRepository
     {
         public Person Update(Person person);
         public Person Get(string doc);

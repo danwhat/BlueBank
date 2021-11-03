@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Interfaces
 {
-    interface ITransactionRepository
+    public interface ITransactionRepository
     {
         public Transaction Create(Transaction transaction);
         public List<Transaction> GetByDoc(string Doc);
