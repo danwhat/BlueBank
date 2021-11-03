@@ -5,9 +5,9 @@ using System;
 
 namespace Domain.Requests
 {
-    public class WithdrawRequest
+    public class DepositRequest
     {
-        public WithdrawRequest(int AccountNumber, TransactionDTO dto)
+        public DepositRequest(int AccountNumber, TransactionDTO dto)
         {
             _accountNumber = AccountNumber;
             _dto = dto;
@@ -25,20 +25,18 @@ namespace Domain.Requests
             Account acc = _accountRepository.Get(_accountNumber);
             // valida se a conta existe
             if (acc == null) return false;
-            // Checar se tem saldo
-            if (_dto.Value > acc.Balance) return false;
             // validado
             return true;
         }
         
-        public TransactionResponseDTO Withdraw()
+        public TransactionResponseDTO Deposit()
         {
             if (!Validate()) throw new Exception("Não passou na validação");
 
             Account acc = _accountRepository.Get(_accountNumber);
 
             Transaction transaction = new();
-            transaction.AccountFrom = acc;
+            transaction.AccountTo = acc;
             transaction.Value = _dto.Value;
 
             try
@@ -46,7 +44,7 @@ namespace Domain.Requests
                 Transaction transactionDB = _transactionRepositoy.Create(transaction);
                 Account accAtualizada = _accountRepository.Get(_accountNumber);
                 var transactionResponse = new TransactionResponseDTO();
-                transactionResponse.Message = "Saque realizado com sucesso.";
+                transactionResponse.Message = "Deposito realizado com sucesso.";
                 transactionResponse.OldBalance = acc.Balance;
                 transactionResponse.CurrentBalance = accAtualizada.Balance;
                 return transactionResponse;

@@ -7,15 +7,15 @@ namespace BlueBank.WebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WithdrawController : ControllerBase
+    public class TransferController : ControllerBase
     {
         [HttpPost("{accountNumber}")]
-        public ObjectResult Withdraw(int accountNumber, [FromBody] TransactionDTO transation)
+        public ObjectResult Transfer(int accountNumber, [FromBody] TransactionDTO transation)
         {
             try
             {
-                var request = new WithdrawRequest(accountNumber, transation);
-                var response = request.Withdraw();
+                var request = new TransferRequest(accountNumber, transation);
+                var response = request.Transfer();
                 return Ok(response);
             }
             catch (Exception e)
