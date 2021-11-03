@@ -22,7 +22,7 @@ namespace Domain.Requests
 
         public Account Get()
         {
-            var account = new Infrastructure.Account();
+            //var account = new Infrastructure.Account;
 
             // var findAccount = _context.Accounts.SingleOrDefault(x => x.Id == account);
 
