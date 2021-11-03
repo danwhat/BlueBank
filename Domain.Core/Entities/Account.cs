@@ -7,7 +7,6 @@ namespace Domain.Entities
         public Person Person { get;  set; }
         public int AccountNumber { get; set; }
         public Decimal Balance { get;  set; }
-
     }
 }
  

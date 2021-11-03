@@ -1,17 +1,16 @@
-﻿using System;
-using Domain.Core.DTOs;
+﻿using Domain.Core.DTOs;
 using Domain.Entities;
-using Infrastructure;
 using Infrastructure.Repositories;
+using System;
 
 namespace Domain.Requests
 {
-    public class CreateAccountRequest
+    public class UpdateAccountRequest
     {
-        public CreateAccountRequest(AccountDto dto)
+        public UpdateAccountRequest(AccountDto dto)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository(context);
+            _accountRepository = new AccountRepository();
         }
 
         private readonly AccountDto _dto;
@@ -19,12 +18,13 @@ namespace Domain.Requests
 
         public bool Validate()
         {
-            // validadoes de docs
-            // validadoes de name
+            // valida se a conta existe
+            Account acc = _accountRepository.Read(_dto.AccountNumber);
+            if (acc != null) return false;
             return true;
         }
         
-        public AccountDto Create()
+        public AccountDto Update()
         {
             if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
 
@@ -50,10 +50,10 @@ namespace Domain.Requests
 
                 account.Person = person;
             }
-
-            Account newAccount = _accountRepository.Create(account);
-            AccountDto response = new(newAccount);
-            return response;
+            
+            Account updatedAccount = _accountRepository.Update(account);
+            AccountDto response = new (updatedAccount);
+            return new AccountDto();
         }
 
         public bool isNaturalPerson()
