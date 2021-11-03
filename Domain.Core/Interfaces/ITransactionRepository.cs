@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Core.Interfaces
 {
-    interface ITransactionRepository
+    public interface ITransactionRepository
     {
         public Transaction Create(Transaction transaction);
-        public List<Transaction> ReadCotainsAcc(Account acc);
-        public List<Transaction> ReadCotainsAcc(int accountNumber);
-        public List<Transaction> ReadByPeriod(DateTime initial, DateTime final, Account acc);
-        public List<Transaction> ReadByPeriod(DateTime initial, DateTime final, int accountNumber);
+        public List<Transaction> GetByDoc(string Doc);
+        public List<Transaction> GetByAcc(int accountNumber);
+        public List<Transaction> GetByPeriod(DateTime initial, DateTime final, string Doc);
+        public List<Transaction> GetByPeriod(DateTime initial, DateTime final, int accountNumber);
     }
 }
