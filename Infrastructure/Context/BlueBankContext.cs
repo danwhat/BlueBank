@@ -25,7 +25,7 @@ namespace Infrastructure
                 .IsUnique();
 
             modelBuilder.Entity<Person>()
-                .Property(person => person.isActive)
+                .Property(person => person.IsActive)
                 .HasDefaultValue(true);
 
             modelBuilder.Entity<Account>()
