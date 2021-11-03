@@ -11,52 +11,52 @@ namespace Domain.Services.Requests
 {
     public class CreateContactRequest
     {
-        private readonly NewContactDto _dto;
-        private readonly AccountRepository _accountRepository;
+        //private readonly NewContactDto _dto;
+        //private readonly AccountRepository _accountRepository;
 
-        public CreateContactRequest(NewContactDto dto)
-        {
-            _dto = dto;
-            _accountRepository = new AccountRepository();
-        }
+        //public CreateContactRequest(NewContactDto dto)
+        //{
+        //    _dto = dto;
+        //    _accountRepository = new AccountRepository();
+        //}
 
-        public bool Validate()
-        {
-            return true;
-        }
+        //public bool Validate()
+        //{
+        //    return true;
+        //}
 
-        public NewContactDto Create()
-        {
-            if (!Validate()) throw new Exception("Faltou o contato.");
+        //public NewContactDto Create()
+        //{
+        //    if (!Validate()) throw new Exception("Faltou o contato.");
 
-            var account = new Account();
+        //    var account = new Account();
 
-            if (isNaturalPerson())
-            {
-                NaturalPerson person = new();
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
+        //    if (isNaturalPerson())
+        //    {
+        //        NaturalPerson person = new();
+        //        person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-                account.Person = person;
-            }
-            else
-            {
-                LegalPerson person = new();
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
+        //        account.Person = person;
+        //    }
+        //    else
+        //    {
+        //        LegalPerson person = new();
+        //        person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-                account.Person = person;
-            }
+        //        account.Person = person;
+        //    }
 
-            Account result = _accountRepository.Create(account);
-            NewContactDto response = new();
-            response.AccountNumber = result.AccountNumber;
-            response.Doc = result.Person.Doc;
-            response.PhoneNumber = result.Person.PhoneNumbers[1];
-            return response;
-        }
+        //    Account result = _accountRepository.Create(account);
+        //    NewContactDto response = new();
+        //    response.AccountNumber = result.AccountNumber;
+        //    response.Doc = result.Person.Doc;
+        //    response.PhoneNumber = result.Person.PhoneNumbers[1];
+        //    return response;
+        //}
 
-        public bool isNaturalPerson()
-        {
-            return _dto.Doc.Length == 11;
-        }
+        //public bool isNaturalPerson()
+        //{
+        //    return _dto.Doc.Length == 11;
+        //}
     }
 }
