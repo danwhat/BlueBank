@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BlueBankContext))]
-    [Migration("20211103121038_SetUp")]
+    [Migration("20211103200607_SetUp")]
     partial class SetUp
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,9 @@ namespace Infrastructure.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(6956));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -40,12 +42,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(7432));
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId")
-                        .IsUnique();
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Accounts");
                 });
@@ -80,6 +83,11 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(9397));
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
@@ -104,7 +112,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 745, DateTimeKind.Local).AddTicks(1052));
 
                     b.Property<string>("Doc")
                         .HasColumnType("nvarchar(450)");
@@ -122,7 +132,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(4042));
 
                     b.HasKey("Id");
 
@@ -164,8 +176,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Account", b =>
                 {
                     b.HasOne("Infrastructure.Person", "Person")
-                        .WithOne("Account")
-                        .HasForeignKey("Infrastructure.Account", "PersonId")
+                        .WithMany("Account")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

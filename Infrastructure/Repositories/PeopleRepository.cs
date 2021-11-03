@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Domain.Core.Interfaces;
 using Domain.Entities;
+using Infrastructure.Shared;
 
 namespace Infrastructure.Repositories
 {
-    public class PeopleRepository
+    public class PeopleRepository : IPersonRepository
     {
         private readonly BlueBankContext _context;
 
@@ -13,107 +16,217 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public Domain.Entities.Person GetByDoc(string docs)
-        {
-            // validacoes
-            var person = GetPersonInDB(docs);
+        #region Interface methods
 
-            if (person.Type == 1)
+        public Domain.Entities.Person Update(string doc, Domain.Entities.Person updatePerson)
+        {
+            int personType = 0;
+            if (updatePerson.GetType() == typeof(NaturalPerson)) personType = 1;
+            if (updatePerson.GetType() == typeof(LegalPerson)) personType = 2;
+            if (personType == 0) return null;
+
+            var dbPerson = GetPerson.ByDocs(doc, _context);
+            if (dbPerson == null) return null;
+
+            dbPerson.Name = updatePerson.Name;
+            dbPerson.Address = updatePerson.Address;
+            dbPerson.Doc = updatePerson.Doc;
+            dbPerson.UpdatedAt = DateTime.Now;
+
+            try
             {
-                var personEntity = new Domain.Entities.NaturalPerson
-                    { Cpf = person.Doc, Name = person.Name, Address = person.Address };
-                return personEntity;
+                var result = _context.People.Update(dbPerson);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
             }
             else
             {
-                var personEntity = new Domain.Entities.LegalPerson
-                    { Cnpj = person.Doc, Name = person.Name, Address = person.Address };
-                return personEntity;
+                return BuildInstance.LegalPerson(dbPerson);
+            }
+        }
+
+        public Domain.Entities.Person Get(string doc)
+        {
+            var dbPerson = GetPerson.IfActive(doc, _context);
+            if (dbPerson == null) return null;
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
+            }
+            else
+            {
+                return BuildInstance.LegalPerson(dbPerson);
+            }
+        }
+
+        public Domain.Entities.Person UpdateContactList(string doc, List<string> list)
+        {
+            var dbPerson = GetPerson.ByDocs(doc, _context);
+            if (dbPerson == null) return null;
+
+            try
+            {
+                _context.Contacts.RemoveRange(
+                    _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id)
+                    );
+                //_context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            dbPerson.Contacts = list
+                .Select(phoneNumber => new Contact { Person = dbPerson, PhoneNumber = phoneNumber })
+                .ToList();
+
+            dbPerson.UpdatedAt = DateTime.Now;
+
+            try
+            {
+                _context.People.Update(dbPerson);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
+            }
+            else
+            {
+                return BuildInstance.LegalPerson(dbPerson);
+            }
+        }
+
+        public Domain.Entities.Person RemoveContact(string doc, string phoneNumber)
+        {
+            var dbPerson = GetPerson.ByDocs(doc, _context);
+            if (dbPerson == null) return null;
+
+            var contact = _context.Contacts
+                .Where(curr => curr.PersonId == dbPerson.Id && curr.PhoneNumber == phoneNumber)
+                .FirstOrDefault<Contact>();
+            if (contact == null) return null;
+
+            try
+            {
+                _context.Contacts.Remove(contact);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
+            }
+            else
+            {
+                return BuildInstance.LegalPerson(dbPerson);
+            }
+
+        }
+
+        public Domain.Entities.Person AddContact(string doc, string phoneNumber)
+        {
+            var dbPerson = GetPerson.ByDocs(doc, _context);
+            if (dbPerson == null) return null;
+
+            var contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
+
+            try
+            {
+                _context.Contacts.Add(contact);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
+            }
+            else
+            {
+                return BuildInstance.LegalPerson(dbPerson);
+            }
+        }
+
+        #endregion
+
+        #region Extra methods
+
+        private Domain.Entities.Person GetByDoc(string docs)
+        {
+            // validacoes
+            var dbPerson = GetPerson.ByDocs(docs, _context);
+
+            if (dbPerson.Type == 1)
+            {
+                return BuildInstance.NaturalPerson(dbPerson);
+            }
+            else
+            {
+                return BuildInstance.LegalPerson(dbPerson);
             }
 
         }
         public Domain.Entities.Person Create(Domain.Entities.Person person)
         {
-            //int personType = 0;
-            //if (person.GetType() == typeof(NaturalPerson)) personType = 1;
-            //if (person.GetType() == typeof(LegalPerson)) personType = 2;
-
-            //if (personType == 0) return null;
-
-            //var dbPerson = _context.People.Where(curr => curr.Doc == person.Doc).FirstOrDefault<Person>();
-
-            //if (dbPerson.Id != 0) throw new Exception();
-
-            //var result = _context.People.Add(new Person
-            //{
-            //    Name = person.Name,
-            //    Doc = person.Doc,
-            //    Type = personType,
-            //    Address = person.Address,
-            //    CreatedAt = DateTime.Now,
-            //    UpdatedAt = DateTime.Now,
-            //});
-            
-            //_context.SaveChanges();
-
-            //person.Id = dbPerson.Id;
-            return person;
-        }
-        public Domain.Entities.Person Update(Domain.Entities.Person person, string docs)
-        {
             int personType = 0;
             if (person.GetType() == typeof(NaturalPerson)) personType = 1;
             if (person.GetType() == typeof(LegalPerson)) personType = 2;
-
             if (personType == 0) return null;
 
-            var dbPerson = GetPersonInDB(docs);
+            var dbPerson = _context.People
+                .Where(curr => curr.Doc == person.Doc)
+                .FirstOrDefault<Person>();
 
-            if (dbPerson == null) throw new Exception();
+            if (dbPerson != null) return null;
 
-            dbPerson.Name = person.Name;
-            dbPerson.Doc = person.Doc;
-            dbPerson.Address = person.Address;
-            dbPerson.UpdatedAt = DateTime.Now;
-
-            var result = _context.People.Update(dbPerson);
+            var result = _context.People.Add(new Person
+            {
+                Name = person.Name,
+                Doc = person.Doc,
+                Type = personType,
+                Address = person.Address,
+            });
 
             _context.SaveChanges();
 
-            if (personType == 1)
-            {
-                var personEntity = new Domain.Entities.NaturalPerson
-                { 
-                    Cpf = dbPerson.Doc,
-                    Name = dbPerson.Name,
-                    Address = dbPerson.Address,
-                    CreatedAt = dbPerson.CreatedAt, 
-                    UpdatedAt = dbPerson.UpdatedAt
-                };
-                return personEntity;
-            }
-            else
-            {
-                var personEntity = new Domain.Entities.LegalPerson
-                {
-                    Cnpj = dbPerson.Doc,
-                    Name = dbPerson.Name,
-                    Address = dbPerson.Address,
-                    CreatedAt = dbPerson.CreatedAt,
-                    UpdatedAt = dbPerson.UpdatedAt
-                };
-                return personEntity;
-            }
+            return person;
         }
-        public void Remove(string docs)
+        private void Remove(string docs)
         {
             var isActive = false;
             try
             {
-                var dbPerson = GetPersonInDB(docs);
+                var dbPerson = GetPerson.ByDocs(docs, _context);
                 if (dbPerson == null) throw new Exception();
                 ChangeStatus(dbPerson, isActive);
-                var dbAccount = RemoveAccount(dbPerson);
+                var dbAccount = DisableAccount(dbPerson);
                 _context.People.Update(dbPerson);
                 if (dbAccount != null) _context.Accounts.Update(dbAccount);
                 _context.SaveChanges();
@@ -123,12 +236,12 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
-        public void Reactivate(string docs)
+        private void Reactivate(string docs)
         {
             var isActive = true;
             try
             {
-                var dbPerson = GetPersonInDB(docs);
+                var dbPerson = GetPerson.ByDocs(docs, _context);
                 if (dbPerson == null) throw new Exception();
                 ChangeStatus(dbPerson, isActive);
                 _context.People.Update(dbPerson);
@@ -139,9 +252,9 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
-        public void AddContact(Domain.Entities.Person person, string newContact)
+        private void AddContact(Domain.Entities.Person person, string newContact)
         {
-            var dbPerson = GetPersonInDB(person.Doc);
+            var dbPerson = GetPerson.ByDocs(person.Doc, _context);
             if (dbPerson == null) throw new Exception();
 
             var dbContact = _context.Contacts
@@ -160,9 +273,9 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
-        public void RemoveContact(Domain.Entities.Person person, string contact)
+        private void RemoveContact(Domain.Entities.Person person, string contact)
         {
-            var dbPerson = GetPersonInDB(person.Doc);
+            var dbPerson = GetPerson.ByDocs(person.Doc, _context);
             if (dbPerson == null) throw new Exception();
 
             var dbContact = _context.Contacts
@@ -182,10 +295,10 @@ namespace Infrastructure.Repositories
         }
         private Person ChangeStatus(Person person, bool status)
         {
-            person.isActive = status;
+            person.IsActive = status;
             return person;
         }
-        private Account RemoveAccount(Person person)
+        private Account DisableAccount(Person person)
         {
             var dbAccount = _context.Accounts
                 .Where(curr => curr.PersonId == person.Id && curr.IsActive == true)
@@ -194,11 +307,7 @@ namespace Infrastructure.Repositories
 
             return dbAccount;
         }
-        private Person GetPersonInDB(string docs)
-        {
-            return _context.People
-                .Where(curr => curr.Doc == docs)
-                .FirstOrDefault<Person>();
-        }
+
+        #endregion
     }
 }

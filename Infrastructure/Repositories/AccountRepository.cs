@@ -85,10 +85,11 @@ namespace Infrastructure.Repositories
             }
 
         }
+        
         public bool Delete(Domain.Entities.Account acc)
         {
-            var dbAccount = GetActiveAccountById(acc.Id);
-            if (dbAccount == null) throw new Exception();
+            var dbAccount = GetActiveAccountById(acc.AccountNumber);
+            if (dbAccount == null) return true;
 
             dbAccount.IsActive = false;
 
@@ -105,6 +106,54 @@ namespace Infrastructure.Repositories
             }
         }
 
+        public Domain.Entities.Account Create(Domain.Entities.Account account)
+        {
+            int personType = 0;
+            if (account.Person.GetType() == typeof(NaturalPerson)) personType = 1;
+            if (account.Person.GetType() == typeof(LegalPerson)) personType = 2;
+            if (personType == 0) return null;
+
+            var dbPerson = GetPerson.ByDocs(account.Person.Doc, _context);
+            if (dbPerson == null)
+            {
+                dbPerson = new Person
+                {
+                    Doc = account.Person.Doc,
+                    Name = account.Person.Name,
+                    Address = account.Person.Address,
+                    Type = personType,
+                };
+            }
+
+            if (dbPerson.IsActive == false) dbPerson.IsActive = true;
+            dbPerson.UpdatedAt = DateTime.Now;
+
+            var dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc);
+            if (dbAccount != null)
+            {
+                Console.WriteLine("Cliente já tem conta!");
+                return null;
+            }
+
+            dbAccount = new Account
+            {
+                Person = dbPerson,
+            };
+
+            try
+            {
+                _context.Accounts.Add(dbAccount);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                Console.WriteLine("Cliente já tem conta!");
+            }
+
+            account.AccountNumber = dbAccount.Id;
+            return account;
+        }
+
         #endregion
 
         private Account GetActiveAccountById(int accNumber)
@@ -116,14 +165,15 @@ namespace Infrastructure.Repositories
         private Account GetActiveAccountByOwnerDoc(string docs)
         {
             var dbPerson = GetPerson.ByDocs(docs, _context);
-            if (dbPerson == null) throw new Exception();
+            if (dbPerson == null) return null;
             return _context.Accounts
                 .Where(account => account.PersonId == dbPerson.Id && account.IsActive == true)
                 .FirstOrDefault<Account>();
         }
 
         #region Extra methods
-        public Domain.Entities.Account GetByPersonDoc(string docs)
+
+        private Domain.Entities.Account GetByPersonDoc(string docs)
         {
             // validacoes
             Account account = null;
@@ -163,56 +213,12 @@ namespace Infrastructure.Repositories
 
         }
 
-        public Domain.Entities.Account Create(Domain.Entities.Account account)
-        {
-            int personType = 0;
-            if (account.Person.GetType() == typeof(NaturalPerson)) personType = 1;
-            if (account.Person.GetType() == typeof(LegalPerson)) personType = 2;
-            if (personType == 0) return null;
-
-            var dbPerson = GetPerson.IsActive(account.Person.Doc, _context);
-            if (dbPerson == null)
-            {
-                dbPerson = new Person
-                {
-                    Doc = account.Person.Doc,
-                    Name = account.Person.Name,
-                    Address = account.Person.Address,
-                    Type = personType,
-                    CreatedAt = DateTime.Now,
-                };
-            }
-
-            if (dbPerson.IsActive == false) dbPerson.IsActive = true;
-            dbPerson.UpdatedAt = DateTime.Now;
-
-            var dbAccount = new Account()
-            {
-                Person = dbPerson,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-            };
-
-            try
-            {
-                _context.Accounts.Add(dbAccount);
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException)
-            {
-                Console.WriteLine("Cliente já tem conta!");
-            }
-
-            account.AccountNumber = dbAccount.Id;
-            return account;
-        }
-
-        public void Remove(Domain.Entities.Account account)
+        private void Remove(Domain.Entities.Account account)
         {
             Account dbAccount = null;
             try
             {
-                dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc); ;
+                dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc);
                 if (dbAccount == null) return;
             }
             catch (Exception e)
@@ -234,9 +240,9 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public void Remove(string docs)
+        private void Remove(string docs)
         {
-            var dbPerson = GetPerson.IsActive(docs, _context);
+            var dbPerson = GetPerson.IfActive(docs, _context);
             if (dbPerson == null) throw new Exception();
 
             var dbAccount = _context.Accounts

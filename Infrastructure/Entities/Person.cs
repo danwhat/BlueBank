@@ -10,8 +10,8 @@ namespace Infrastructure
         public string Address { get; internal set; }
         public int Type { get; internal set; }
         public string Doc { get; internal set; }
-        public Account Account { get; set; }
-        public List<Contact> Contacts { get; set; }
+        public ICollection<Account> Account { get; set; }
+        public ICollection<Contact> Contacts { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public DateTime UpdatedAt { get; internal set; }
         public bool IsActive { get; set; }
