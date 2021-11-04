@@ -9,10 +9,17 @@ namespace Domain.Core.DTOs
         {
         }
 
+        // TODO: Testar
+        // person null
+        // person not null
+        // person not Null c/ PhoneNumbers null
+        // person not Null c/ PhoneNumbers null
+        // accountNumber Null
+        // accountNumber not Null
         public PersonResponseDto(Person person, int accountNumber)
         {
             AccountNumber = accountNumber;
-            PhoneNumber = person.PhoneNumbers;
+            PhoneNumber = person?.PhoneNumbers;
         }
 
         public int AccountNumber { get; set; }

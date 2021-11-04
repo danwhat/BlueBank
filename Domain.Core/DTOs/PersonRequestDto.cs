@@ -4,14 +4,10 @@ namespace Domain.Core.DTOs
 {
     public class PersonRequestDto
     {
-        public PersonRequestDto()
+        public PersonRequestDto(int accountNumber, string phoneNumber)
         {
-        }
-
-        public PersonRequestDto(Account acc)
-        {
-            AccountNumber = acc.AccountNumber;
-            PhoneNumber = acc.Person.PhoneNumbers[0];
+            AccountNumber = accountNumber;
+            PhoneNumber = phoneNumber;
         }
 
         public int AccountNumber { get; set; }

@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Services", "Domain\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{B44B5DAA-C9D9-4F35-AA79-99CCD86642BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBank.WebAPI", "BlueBank.WebAPI\BlueBank.WebAPI.csproj", "{FFF08796-95C4-4C09-9B10-923E48BF3058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueBank.WebAPI", "BlueBank.WebAPI\BlueBank.WebAPI.csproj", "{FFF08796-95C4-4C09-9B10-923E48BF3058}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Core", "Domain.Core\Domain.Core.csproj", "{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Core", "Domain.Core\Domain.Core.csproj", "{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{6CC59D48-312E-4C34-90C9-405588BB7AF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97C80445-3CCF-42A7-AE77-6DAE2F1AFC7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC59D48-312E-4C34-90C9-405588BB7AF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC59D48-312E-4C34-90C9-405588BB7AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC59D48-312E-4C34-90C9-405588BB7AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC59D48-312E-4C34-90C9-405588BB7AF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

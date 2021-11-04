@@ -51,7 +51,7 @@ namespace Domain.Requests
             }
             catch(Exception e)
             {
-                throw new Exception("Deu erro aqui.");
+                throw new Exception("Deu erro aqui." + e.Message);
             }
         }
     }

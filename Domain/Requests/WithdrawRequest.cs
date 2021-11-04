@@ -31,7 +31,7 @@ namespace Domain.Requests
             }
             catch(ServerException e)
             {
-                // valida se a conta existe
+                Console.WriteLine(e.Message);// valida se a conta existe
                 return false;
             }
             // validado
@@ -60,11 +60,11 @@ namespace Domain.Requests
             }
             catch (ServerException e)
             {
-                throw new ServerException("Deu erro aqui.");
+                throw new ServerException("Deu erro aqui."+ e.Message);
             }
             catch (Exception e)
             {
-                throw new Exception("Deu erro aqui.");
+                throw new Exception("Deu erro aqui." + e.Message);
             }
         }
     }
