@@ -2,61 +2,39 @@
 using Domain.Entities;
 using Infrastructure.Repositories;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Domain.Services.Requests
+namespace Domain.Requests
 {
     public class CreateContactRequest
     {
-        private readonly NewContactDto _dto;
-        private readonly AccountRepository _accountRepository;
-
-        public CreateContactRequest(NewContactDto dto)
+        public CreateContactRequest(int accountNumber, PersonRequestDto phone)
         {
-            _dto = dto;
+            _accountNumber = accountNumber;
+            _phone = phone;
             _accountRepository = new AccountRepository();
+            _personRepository = new PersonRepository();
         }
+
+        private readonly int _accountNumber;
+        private readonly PersonRequestDto _phone;
+        private readonly AccountRepository _accountRepository;
+        private readonly PersonRepository _personRepository;
 
         public bool Validate()
         {
             return true;
         }
 
-        public NewContactDto Create()
+        public PersonResponseDto Create()
         {
-            if (!Validate()) throw new Exception("Faltou o contato.");
+            if (!Validate()) throw new Exception("Algo de errado");
 
-            var account = new Account();
+            var doc = _accountRepository.Get(_accountNumber).Person.Doc;
 
-            if (isNaturalPerson())
-            {
-                NaturalPerson person = new();
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
+            Person currentPerson = _personRepository.AddContact(doc, _phone.PhoneNumber);
+            PersonResponseDto response = new(currentPerson, _accountNumber);
 
-                account.Person = person;
-            }
-            else
-            {
-                LegalPerson person = new();
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
-
-                account.Person = person;
-            }
-
-            Account result = _accountRepository.Create(account);
-            NewContactDto response = new();
-            response.AccountNumber = result.AccountNumber;
-            response.Doc = result.Person.Doc;
-            response.PhoneNumber = result.Person.PhoneNumbers[1];
             return response;
-        }
-
-        public bool isNaturalPerson()
-        {
-            return _dto.Doc.Length == 11;
         }
     }
 }
