@@ -1,4 +1,5 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Entities;
 using Infrastructure.Repositories;
 using System;
@@ -22,11 +23,17 @@ namespace Domain.Requests
 
         public bool Validate()
         {
-            Account acc = _accountRepository.Get(_accountNumber);
-            // valida se a conta existe
-            if (acc == null) return false;
-            // Checar se tem saldo
-            if (_dto.Value > acc.Balance) return false;
+            try
+            {
+                Account acc = _accountRepository.Get(_accountNumber);
+                // Checar se tem saldo
+                if (_dto.Value > acc.Balance) return false;
+            }
+            catch(ServerException e)
+            {
+                // valida se a conta existe
+                return false;
+            }
             // validado
             return true;
         }
@@ -51,7 +58,11 @@ namespace Domain.Requests
                 transactionResponse.CurrentBalance = accAtualizada.Balance;
                 return transactionResponse;
             }
-            catch(Exception e)
+            catch (ServerException e)
+            {
+                throw new ServerException("Deu erro aqui.");
+            }
+            catch (Exception e)
             {
                 throw new Exception("Deu erro aqui.");
             }
