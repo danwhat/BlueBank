@@ -62,15 +62,15 @@ namespace BlueBank.WebAPI.Controllers
         {
             var request = new DeleteAccountRequest(accountNumber);
 
-        //    try
-        //    {
-        //        var result = request.Delete();
-        //        return Ok(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest("Mensagem de erro:" + e.Message);
-        //    }
-        //}
+            try
+            {
+                var result = request.Delete();
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+        }
     }    
 }
