@@ -24,6 +24,10 @@ namespace Domain.Requests
 
         public Person Delete()
         {
+            Person person = _personRepository.Get(_doc);
+            if (person == null) throw new Exception("Não existe nenhuma pessoa cadastrada com esse documento!");
+            if (!person.PhoneNumbers.Contains(_phoneNumber)) throw new Exception("Esse número de telefone não está cadastrado");
+
             Person result = _personRepository.RemoveContact(_doc, _phoneNumber);
             return result;
         }
