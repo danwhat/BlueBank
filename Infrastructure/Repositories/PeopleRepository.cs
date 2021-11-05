@@ -151,17 +151,23 @@ namespace Infrastructure.Repositories
             var dbPerson = GetPerson.ByDocs(doc, _context);
             if (dbPerson == null) return null;
 
-            var contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
+            var contactDuplicate = _context.Contacts
+                .Where(contact => contact.PersonId == dbPerson.Id && contact.PhoneNumber == phoneNumber)
+                .FirstOrDefault<Contact>();
+            if (contactDuplicate == null)
+            {
+                var contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
 
-            try
-            {
-                _context.Contacts.Add(contact);
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
+                try
+                {
+                    _context.Contacts.Add(contact);
+                    _context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return null;
+                }
             }
 
             if (dbPerson.Type == 1)

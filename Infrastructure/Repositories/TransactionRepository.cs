@@ -79,7 +79,7 @@ namespace Infrastructure.Repositories
         private void Deposit(Domain.Entities.Transaction transaction)
         {
 
-            var account = GetAccount.GetActiveAccountById(transaction.AccountTo.AccountNumber, _context);
+            var account = GetAccount.IfActiveById(transaction.AccountTo.AccountNumber, _context);
             if (IsNull(account)) return;
 
             var dbTransaction = new Transaction()
@@ -87,16 +87,13 @@ namespace Infrastructure.Repositories
                 AccountTo = account,
                 Value = transaction.Value,
             };
+            
+            var logs = (ICollection<TransactionLog>)_context
+                .TransactionLog
+                .Where(log => log.AccountId == account.Id)
+                .ToList();
 
-            var logs = _context.TransactionLog
-                .Where(log => log.AccountId == account.Id).ToList();
-
-            decimal balance = 0;
-
-            if (logs.Count > 0)
-            {
-                balance = logs.OrderByDescending(item => item.CreatedAt).Last().BalanceAfter;
-            }
+            decimal balance = (GetBalance.Current(logs));
 
             var transactionLog = new TransactionLog()
             {

@@ -20,29 +20,27 @@ namespace Infrastructure.Repositories
 
         public Domain.Entities.Account Get(int accountNumber)
         {
-            var account = GetAccount.GetActiveAccountById(accountNumber, _context);
+            if (accountNumber < 1) return null;
+
+            var account = GetAccount.IfActiveById(accountNumber, _context);
             if (account == null) return null;
 
-            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = GetBalance.Current(account.TransactionLogs);
 
             var accountEntity = new Domain.Entities.Account
             {
                 AccountNumber = account.Id,
-                Balance = (currentBalance == null) ? 0 : currentBalance.Value
+                Balance = currentBalance
             };
 
             if (account.Person.Type == 1)
             {
-                var personEntity = new Domain.Entities.NaturalPerson
-                { Cpf = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
+                accountEntity.Person = BuildInstance.NaturalPerson(account.Person);
                 return accountEntity;
             }
             else
             {
-                var personEntity = new Domain.Entities.LegalPerson
-                { Cnpj = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
+                accountEntity.Person = BuildInstance.LegalPerson(account.Person);
                 return accountEntity;
             }
         }
@@ -52,7 +50,7 @@ namespace Infrastructure.Repositories
             Account account = null;
             try
             {
-                account = GetActiveAccountByOwnerDoc(ownerDoc);
+                account = GetAccount.IfActiveByOwnerDoc(ownerDoc, _context);
                 if (account == null) return null;
             }
             catch (Exception e)
@@ -61,12 +59,12 @@ namespace Infrastructure.Repositories
                 return null;
             }
 
-            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = GetBalance.Current(account.TransactionLogs);
 
             var accountEntity = new Domain.Entities.Account
             {
                 AccountNumber = account.Id,
-                Balance = (currentBalance == null) ? 0 : currentBalance.Value
+                Balance = currentBalance
             };
 
             if (account.Person.Type == 1)
@@ -88,7 +86,7 @@ namespace Infrastructure.Repositories
         
         public bool Delete(Domain.Entities.Account acc)
         {
-            var dbAccount = GetAccount.GetActiveAccountById(acc.AccountNumber, _context);
+            var dbAccount = GetAccount.IfActiveById(acc.AccountNumber, _context);
             if (dbAccount == null) return true;
 
             dbAccount.IsActive = false;
@@ -128,7 +126,7 @@ namespace Infrastructure.Repositories
             if (dbPerson.IsActive == false) dbPerson.IsActive = true;
             dbPerson.UpdatedAt = DateTime.Now;
 
-            var dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc);
+            var dbAccount = GetAccount.IfActiveByOwnerId(account.Person.Id, _context);
             if (dbAccount != null)
             {
                 Console.WriteLine("Cliente já tem conta");
@@ -155,14 +153,6 @@ namespace Infrastructure.Repositories
         }
 
         #endregion        
-        private Account GetActiveAccountByOwnerDoc(string docs)
-        {
-            var dbPerson = GetPerson.ByDocs(docs, _context);
-            if (dbPerson == null) return null;
-            return _context.Accounts
-                .Where(account => account.PersonId == dbPerson.Id && account.IsActive == true)
-                .FirstOrDefault<Account>();
-        }
 
         #region Extra methods
 
@@ -172,7 +162,7 @@ namespace Infrastructure.Repositories
             Account account = null;
             try
             {
-                account = GetActiveAccountByOwnerDoc(docs);
+                account = GetAccount.IfActiveByOwnerDoc(docs, _context);
                 if (account == null) return null;
             }
             catch (Exception e)
@@ -181,12 +171,12 @@ namespace Infrastructure.Repositories
                 return null;
             }
 
-            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = GetBalance.Current(account.TransactionLogs);
 
             var accountEntity = new Domain.Entities.Account
             {
                 AccountNumber = account.Id,
-                Balance = (currentBalance == null) ? 0 : currentBalance.Value
+                Balance = currentBalance
             };
 
             if (account.Person.Type == 1)
@@ -211,7 +201,7 @@ namespace Infrastructure.Repositories
             Account dbAccount = null;
             try
             {
-                dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc);
+                dbAccount = GetAccount.IfActiveByOwnerDoc(account.Person.Doc, _context);
                 if (dbAccount == null) return;
             }
             catch (Exception e)
