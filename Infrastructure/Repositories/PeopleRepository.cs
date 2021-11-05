@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Core.Interfaces;
-using Domain.Entities;
 using Infrastructure.Shared;
 
 namespace Infrastructure.Repositories
@@ -17,12 +16,9 @@ namespace Infrastructure.Repositories
         }
 
         #region Interface methods
-
         public Domain.Entities.Person Update(string doc, Domain.Entities.Person updatePerson)
         {
-            int personType = 0;
-            if (updatePerson.GetType() == typeof(NaturalPerson)) personType = 1;
-            if (updatePerson.GetType() == typeof(LegalPerson)) personType = 2;
+            int personType = GetPerson.Type(updatePerson);
             if (personType == 0) return null;
 
             var dbPerson = GetPerson.ByDocs(doc, _context);
@@ -76,10 +72,11 @@ namespace Infrastructure.Repositories
 
             try
             {
-                _context.Contacts.RemoveRange(
-                    _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id)
+                _context.Contacts
+                    .RemoveRange
+                    (
+                        _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id)
                     );
-                //_context.SaveChanges();
             }
             catch (Exception e)
             {
@@ -179,11 +176,36 @@ namespace Infrastructure.Repositories
                 return BuildInstance.LegalPerson(dbPerson);
             }
         }
-
         #endregion
+        public Domain.Entities.Person Create(Domain.Entities.Person person)
+        {
+            int personType = GetPerson.Type(person);
+            if (personType == 0) return null;
+
+            var dbPerson = GetPerson.ByDocs(person.Doc, _context);
+            if (dbPerson != null) return null;
+
+            try
+            {
+                _context.People.Add(new Person
+                {
+                    Name = person.Name,
+                    Doc = person.Doc,
+                    Address = person.Address,
+                    Type = personType,
+                });
+
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return person;
+        }
 
         #region Extra methods
-
         private Domain.Entities.Person GetByDoc(string docs)
         {
             // validacoes
@@ -199,38 +221,14 @@ namespace Infrastructure.Repositories
             }
 
         }
-        public Domain.Entities.Person Create(Domain.Entities.Person person)
-        {
-            int personType = 0;
-            if (person.GetType() == typeof(NaturalPerson)) personType = 1;
-            if (person.GetType() == typeof(LegalPerson)) personType = 2;
-            if (personType == 0) return null;
-
-            var dbPerson = _context.People
-                .Where(curr => curr.Doc == person.Doc)
-                .FirstOrDefault<Person>();
-
-            if (dbPerson != null) return null;
-
-            var result = _context.People.Add(new Person
-            {
-                Name = person.Name,
-                Doc = person.Doc,
-                Type = personType,
-                Address = person.Address,
-            });
-
-            _context.SaveChanges();
-
-            return person;
-        }
+        
         private void Remove(string docs)
         {
             var isActive = false;
             try
             {
                 var dbPerson = GetPerson.ByDocs(docs, _context);
-                if (dbPerson == null) throw new Exception();
+                if (dbPerson == null) return;
                 ChangeStatus(dbPerson, isActive);
                 var dbAccount = DisableAccount(dbPerson);
                 _context.People.Update(dbPerson);
@@ -242,6 +240,7 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
+        
         private void Reactivate(string docs)
         {
             var isActive = true;
@@ -258,6 +257,7 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
+        
         private void AddContact(Domain.Entities.Person person, string newContact)
         {
             var dbPerson = GetPerson.ByDocs(person.Doc, _context);
@@ -279,6 +279,7 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
+        
         private void RemoveContact(Domain.Entities.Person person, string contact)
         {
             var dbPerson = GetPerson.ByDocs(person.Doc, _context);
@@ -299,11 +300,14 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
+        #endregion
+        
         private Person ChangeStatus(Person person, bool status)
         {
             person.IsActive = status;
             return person;
         }
+        
         private Account DisableAccount(Person person)
         {
             var dbAccount = _context.Accounts
@@ -313,7 +317,5 @@ namespace Infrastructure.Repositories
 
             return dbAccount;
         }
-
-        #endregion
     }
 }

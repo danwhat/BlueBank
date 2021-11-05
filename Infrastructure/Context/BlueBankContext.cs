@@ -30,6 +30,9 @@ namespace Infrastructure
             modelBuilder.Entity<Person>()
                 .Property(person => person.CreatedAt)
                 .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Person>()
+                .Property(person => person.UpdatedAt)
+                .HasDefaultValue(null);
 
             modelBuilder.Entity<Account>()
                 .Property(account => account.IsActive)
@@ -37,6 +40,9 @@ namespace Infrastructure
             modelBuilder.Entity<Account>()
                 .Property(account => account.CreatedAt)
                 .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Account>()
+                .Property(person => person.UpdatedAt)
+                .HasDefaultValue(null);
 
             modelBuilder.Entity<Contact>()
                 .Property(contact => contact.CreatedAt)

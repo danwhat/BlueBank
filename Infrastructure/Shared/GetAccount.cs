@@ -11,6 +11,7 @@ namespace Infrastructure.Shared
                 .Where(account => account.Id == accNumber && account.IsActive == true)
                 .Include(account => account.Person)
                     .ThenInclude(person => person.Contacts)
+                .Include(account => account.TransactionLogs)
                 .FirstOrDefault<Account>();
         }
 
@@ -19,6 +20,8 @@ namespace Infrastructure.Shared
             return context.Accounts
                 .Where(account => account.PersonId == ownerId && account.IsActive == true)
                 .Include(account => account.Person)
+                    .ThenInclude(person => person.Contacts)
+                .Include(account => account.TransactionLogs)
                 .FirstOrDefault<Account>();
         }
 
@@ -29,6 +32,7 @@ namespace Infrastructure.Shared
             return context.Accounts
                 .Where(account => account.PersonId == dbPerson.Id && account.IsActive == true)
                 .Include(account => account.Person)
+                .Include(account => account.TransactionLogs)
                 .FirstOrDefault<Account>();
         }
     }

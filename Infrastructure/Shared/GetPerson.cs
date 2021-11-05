@@ -20,5 +20,12 @@ namespace Infrastructure.Shared
                 .Include(person => person.Contacts)
                 .FirstOrDefault<Person>();
         }
+
+        internal static int Type(Domain.Entities.Person person)
+        {
+            if (person.GetType() == typeof(Domain.Entities.NaturalPerson)) return 1;
+            if (person.GetType() == typeof(Domain.Entities.LegalPerson)) return 2;
+            return 0;
+        }
     }
 }

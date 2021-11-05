@@ -33,7 +33,7 @@ namespace Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(ownerDoc)) return null;
 
-            Account account = null;
+            Account account;
 
             try
             {
@@ -73,25 +73,7 @@ namespace Infrastructure.Repositories
 
         public Domain.Entities.Account Create(Domain.Entities.Account account)
         {
-            int personType = 0;
-            if (account.Person.GetType() == typeof(NaturalPerson)) personType = 1;
-            if (account.Person.GetType() == typeof(LegalPerson)) personType = 2;
-            if (personType == 0) return null;
-
-            var dbPerson = GetPerson.ByDocs(account.Person.Doc, _context);
-            if (dbPerson == null)
-            {
-                dbPerson = new Person
-                {
-                    Doc = account.Person.Doc,
-                    Name = account.Person.Name,
-                    Address = account.Person.Address,
-                    Type = personType,
-                };
-            }
-
-            if (dbPerson.IsActive == false) dbPerson.IsActive = true;
-            dbPerson.UpdatedAt = DateTime.Now;
+            var dbPerson = GetOrCreatePerson(account);
 
             var dbAccount = GetAccount.IfActiveByOwnerId(account.Person.Id, _context);
             if (dbAccount != null)
@@ -232,5 +214,35 @@ namespace Infrastructure.Repositories
 
         }
 
+        private Person GetOrCreatePerson(Domain.Entities.Account account)
+        {
+            int personType = GetPerson.Type(account.Person);
+            if (personType == 0) return null;
+
+            var dbPerson = GetPerson.ByDocs(account.Person.Doc, _context);
+            if (dbPerson == null)
+            {
+                dbPerson = new Person
+                {
+                    Doc = account.Person.Doc,
+                    Name = account.Person.Name,
+                    Address = account.Person.Address,
+                    Type = personType,
+                };
+            }
+
+            ActivatePerson(dbPerson);
+
+            return dbPerson;
+        }
+
+        private void ActivatePerson(Person dbPerson)
+        {
+            if (dbPerson.IsActive == false)
+            {
+                dbPerson.IsActive = true;
+                dbPerson.UpdatedAt = DateTime.Now;
+            }
+        }
     }
 }

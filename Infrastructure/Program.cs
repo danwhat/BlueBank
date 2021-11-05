@@ -13,14 +13,18 @@ namespace Infrastructure
             var accountRepository = new AccountRepository(context);
             var transactionRepository = new TransactionRepository(context);
 
-            var now = DateTime.Now;
+            //var now = DateTime.Now;
+
             // criação de user
-            var person = new Domain.Entities.NaturalPerson
-            { Name = "Alexandre Leite", Cpf = "123", Address = "Rua da Vila Xp" };
-            //var newPerson = peopleRepository.Create(person);
+            //var person = new Domain.Entities.NaturalPerson
+            //{ Name = "Alexandre Leite", Cpf = "123", Address = "Rua da Vila Xp" };
+
+            //var person2 = new Domain.Entities.NaturalPerson
+            //{ Name = "Alexandre Segundus", Cpf = "888", Address = "Rua de Trás da Vila Xp" };
+            //var newPerson = peopleRepository.Create(person2);
 
             // add contact
-            //peopleRepository.AddContact("123", "aloooooou767676");
+            var personWithContact = peopleRepository.AddContact("123", "aloooooou767676");
 
             // pegar user
             //var teste = peopleRepository.Get("123");
@@ -46,14 +50,15 @@ namespace Infrastructure
 
             //var teste = peopleRepository.Get("123");
 
-            // get account
-            var result = accountRepository.Get(2);
-            //var result = accountRepository.Get(0);
-            //var result = accountRepository.Get("123");
-
             //criar conta
             //var newAccount = new Domain.Entities.Account { Person = person };
             //var resultAccount = accountRepository.Create(newAccount);
+
+            // get account
+            //var result = accountRepository.Get(2);
+            //var result = accountRepository.Get(0);
+            var result = accountRepository.Get("123");
+
 
             //remove account
             //var account = new Domain.Entities.Account { AccountNumber = 1 };
@@ -62,10 +67,10 @@ namespace Infrastructure
             //Console.WriteLine($"Conta removida? {((result) ? "sim" : "não")}");
             //Console.WriteLine(updated.PhoneNumbers);
 
-            var transaction = new Domain.Entities.Transaction()
-            {
-                AccountTo = result,                
-            };
+            //var transaction = new Domain.Entities.Transaction()
+            //{
+            //    AccountTo = result,
+            //};
 
             //transaction.SetValue(250.00m);
 

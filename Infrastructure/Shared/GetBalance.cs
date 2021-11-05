@@ -12,10 +12,9 @@ namespace Infrastructure.Shared
         {
             var dbBalance = transactionLogs?
                 .OrderBy(item => item.CreatedAt)
-                .First()
-                .BalanceAfter;
+                .FirstOrDefault<TransactionLog>();
 
-            return dbBalance ?? 0m;
+            return dbBalance?.BalanceAfter ?? 0m;
         }
     }
 }

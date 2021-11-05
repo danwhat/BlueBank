@@ -19,7 +19,7 @@ namespace Infrastructure.Migrations
                     Doc = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 31, 1, 278, DateTimeKind.Local).AddTicks(3565))
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 41, 36, 978, DateTimeKind.Local).AddTicks(5991))
                 },
                 constraints: table =>
                 {
@@ -35,7 +35,7 @@ namespace Infrastructure.Migrations
                     PersonId = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 31, 1, 280, DateTimeKind.Local).AddTicks(1618))
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(1340))
                 },
                 constraints: table =>
                 {
@@ -56,7 +56,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PersonId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 31, 1, 280, DateTimeKind.Local).AddTicks(2431))
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(2474))
                 },
                 constraints: table =>
                 {
@@ -78,7 +78,7 @@ namespace Infrastructure.Migrations
                     AccountFromId = table.Column<int>(type: "int", nullable: true),
                     AccountToId = table.Column<int>(type: "int", nullable: true),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 31, 1, 282, DateTimeKind.Local).AddTicks(3515))
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 41, 36, 985, DateTimeKind.Local).AddTicks(3338))
                 },
                 constraints: table =>
                 {
@@ -107,7 +107,7 @@ namespace Infrastructure.Migrations
                     BalanceAfter = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     TransactionId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 31, 1, 288, DateTimeKind.Local).AddTicks(2487))
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2021, 11, 5, 16, 41, 36, 997, DateTimeKind.Local).AddTicks(4188))
                 },
                 constraints: table =>
                 {
