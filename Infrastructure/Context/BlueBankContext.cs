@@ -30,18 +30,12 @@ namespace Infrastructure
             modelBuilder.Entity<Person>()
                 .Property(person => person.CreatedAt)
                 .HasDefaultValue(DateTime.Now);
-            modelBuilder.Entity<Person>()
-                .Property(person => person.UpdatedAt)
-                .HasDefaultValue(DateTime.Now);
 
             modelBuilder.Entity<Account>()
                 .Property(account => account.IsActive)
                 .HasDefaultValue(true);
             modelBuilder.Entity<Account>()
                 .Property(account => account.CreatedAt)
-                .HasDefaultValue(DateTime.Now);
-            modelBuilder.Entity<Account>()
-                .Property(account => account.UpdatedAt)
                 .HasDefaultValue(DateTime.Now);
 
             modelBuilder.Entity<Contact>()

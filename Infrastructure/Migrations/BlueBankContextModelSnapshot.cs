@@ -29,7 +29,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 296, DateTimeKind.Local).AddTicks(6185));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 31, 1, 280, DateTimeKind.Local).AddTicks(1618));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -40,9 +40,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 296, DateTimeKind.Local).AddTicks(6753));
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -61,7 +59,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 296, DateTimeKind.Local).AddTicks(7512));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 31, 1, 280, DateTimeKind.Local).AddTicks(2431));
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
@@ -89,7 +87,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 293, DateTimeKind.Local).AddTicks(6560));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 31, 1, 278, DateTimeKind.Local).AddTicks(3565));
 
                     b.Property<string>("Doc")
                         .HasColumnType("nvarchar(450)");
@@ -107,9 +105,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 296, DateTimeKind.Local).AddTicks(3012));
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -136,7 +132,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 301, DateTimeKind.Local).AddTicks(3467));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 31, 1, 282, DateTimeKind.Local).AddTicks(3515));
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
@@ -166,7 +162,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 4, 15, 7, 8, 312, DateTimeKind.Local).AddTicks(5601));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 31, 1, 288, DateTimeKind.Local).AddTicks(2487));
 
                     b.Property<int>("TransactionId")
                         .HasColumnType("int");
