@@ -38,7 +38,7 @@ namespace Infrastructure
             //    "aooooooo",
             //    "vai Disgrama!"
             //};
-            //var result = peopleRepository.UpdateContactList("123", list);
+            //var listResult = peopleRepository.UpdateContactList("123", list);
 
             // remove contact
             //var retorno = peopleRepository.RemoveContact("123", "vai Disgrama!");
@@ -47,9 +47,9 @@ namespace Infrastructure
             //var teste = peopleRepository.Get("123");
 
             // get account
-            //var result = accountRepository.Get(1);
+            var result = accountRepository.Get(2);
             //var result = accountRepository.Get(0);
-            var result = accountRepository.Get("123");
+            //var result = accountRepository.Get("123");
 
             //criar conta
             //var newAccount = new Domain.Entities.Account { Person = person };
@@ -67,9 +67,9 @@ namespace Infrastructure
                 AccountTo = result,                
             };
 
-            transaction.SetValue(250.00m);
+            //transaction.SetValue(250.00m);
 
-            transactionRepository.Create(transaction);
+            //transactionRepository.Create(transaction);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Infrastructure.Shared
 {
@@ -6,33 +7,18 @@ namespace Infrastructure.Shared
     {
         internal static Person ByDocs(string docs, BlueBankContext context)
         {
-            var person = context.People
+            return context.People
                 .Where(curr => curr.Doc == docs)
+                .Include(person => person.Contacts)
                 .FirstOrDefault<Person>();
-
-            var contactList = context.Contacts
-                .Where(contact => contact.PersonId == person.Id)
-                .ToList();
-
-            person.Contacts = contactList;
-
-            return person;
         }
 
         internal static Person IfActive(string docs, BlueBankContext context)
         {
-            var person = context.People
+            return context.People
                 .Where(curr => curr.Doc == docs && curr.IsActive == true)
+                .Include(person => person.Contacts)
                 .FirstOrDefault<Person>();
-
-            var contactList = context.Contacts
-                .Where(contact => contact.PersonId == person.Id)
-                .ToList();
-
-            person.Contacts = contactList;
-
-            return person;
-
         }
     }
 }
