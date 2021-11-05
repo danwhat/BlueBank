@@ -25,20 +25,20 @@ namespace BlueBank.WebAPI.Controllers
 
         }
 
-        [HttpPut]
-        public ObjectResult UpdateAccount([FromBody] AccountDto dto)
-        {
-            try
-            {
-                var request = new UpdateAccountRequest(dto);
-                var result = request.Update();
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("Mensagem de erro:" + e.Message);
-            }
-        }
+        //[HttpPut]
+        //public ObjectResult UpdateAccount([FromBody] AccountDto dto)
+        //{
+        //    try
+        //    {
+        //        var request = new UpdateAccountRequest(dto);
+        //        var result = request.Update();
+        //        return Ok(result);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest("Mensagem de erro:" + e.Message);
+        //    }
+        //}
 
         [HttpGet("{accountNumber}")]
         public ObjectResult GetAccount(int accountNumber)

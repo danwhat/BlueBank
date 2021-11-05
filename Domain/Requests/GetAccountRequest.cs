@@ -22,13 +22,8 @@ namespace Domain.Requests
 
         public Account Get()
         {
-            //var account = new Infrastructure.Account;
-
-            // var findAccount = _context.Accounts.SingleOrDefault(x => x.Id == account);
-
             Account result = _accountRepository.Get(_accountNumber);
-            // int response = new();
-
+            //Account result = new();
             return result;
         }
     }

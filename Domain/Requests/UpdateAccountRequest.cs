@@ -24,37 +24,37 @@ namespace Domain.Requests
             return true;
         }
         
-        public AccountDto Update()
-        {
-            if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
+        //public AccountDto Update()
+        //{
+        //    if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
 
-            var account = new Account();
+        //    var account = new Account();
             
-            if (isNaturalPerson())
-            {
-                NaturalPerson person = new ();
-                person.Name = _dto.Name;
-                person.Address = _dto.Address;
-                person.Cpf = _dto.Doc;
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
+        //    if (isNaturalPerson())
+        //    {
+        //        NaturalPerson person = new ();
+        //        person.Name = _dto.Name;
+        //        person.Address = _dto.Address;
+        //        person.Cpf = _dto.Doc;
+        //        person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-                account.Person = person;
-            }
-            else
-            {
-                LegalPerson person = new ();
-                person.Name = _dto.Name;
-                person.Address = _dto.Address;
-                person.Cnpj = _dto.Doc;
-                person.PhoneNumbers.Add(_dto.PhoneNumber);
+        //        account.Person = person;
+        //    }
+        //    else
+        //    {
+        //        LegalPerson person = new ();
+        //        person.Name = _dto.Name;
+        //        person.Address = _dto.Address;
+        //        person.Cnpj = _dto.Doc;
+        //        person.PhoneNumbers.Add(_dto.PhoneNumber);
 
-                account.Person = person;
-            }
+        //        account.Person = person;
+        //    }
             
-            Account updatedAccount = _accountRepository.Update(account);
-            AccountDto response = new (updatedAccount);
-            return new AccountDto();
-        }
+        //    Account updatedAccount = _accountRepository.Update(account);
+        //    AccountDto response = new (updatedAccount);
+        //    return new AccountDto();
+        //}
 
         public bool isNaturalPerson()
         {
