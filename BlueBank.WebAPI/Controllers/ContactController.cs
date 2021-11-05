@@ -20,7 +20,7 @@ namespace BlueBank.WebAPI.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Mensagem de errooooooooo:" + e.Message);
+                return BadRequest("Mensagem de erro:" + e.Message);
             }
         }
 
