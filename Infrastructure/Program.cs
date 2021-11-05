@@ -11,12 +11,13 @@ namespace Infrastructure
             var context = new BlueBankContext();
             var peopleRepository = new PeopleRepository(context);
             var accountRepository = new AccountRepository(context);
+            var transactionRepository = new TransactionRepository(context);
 
             var now = DateTime.Now;
             // criação de user
             var person = new Domain.Entities.NaturalPerson
             { Name = "Alexandre Leite", Cpf = "123", Address = "Rua da Vila Xp" };
-            var newPerson = peopleRepository.Create(person);
+            //var newPerson = peopleRepository.Create(person);
 
             // add contact
             //peopleRepository.AddContact("123", "aloooooou767676");
@@ -43,23 +44,32 @@ namespace Infrastructure
             //var retorno = peopleRepository.RemoveContact("123", "vai Disgrama!");
 
 
-            var teste = peopleRepository.Get("123");
+            //var teste = peopleRepository.Get("123");
 
             // get account
             //var result = accountRepository.Get(1);
             //var result = accountRepository.Get(0);
-            //var result = accountRepository.Get("123");
+            var result = accountRepository.Get("123");
 
             //criar conta
-            var newAccount = new Domain.Entities.Account { Person = person };
-            var resultAccount = accountRepository.Create(newAccount);
-            
+            //var newAccount = new Domain.Entities.Account { Person = person };
+            //var resultAccount = accountRepository.Create(newAccount);
+
             //remove account
             //var account = new Domain.Entities.Account { AccountNumber = 1 };
             //var result = accountRepository.Delete(account);
 
             //Console.WriteLine($"Conta removida? {((result) ? "sim" : "não")}");
             //Console.WriteLine(updated.PhoneNumbers);
+
+            var transaction = new Domain.Entities.Transaction()
+            {
+                AccountTo = result,                
+            };
+
+            transaction.SetValue(250.00m);
+
+            transactionRepository.Create(transaction);
         }
     }
 }

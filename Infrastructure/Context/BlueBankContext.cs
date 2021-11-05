@@ -8,7 +8,7 @@ namespace Infrastructure
         internal DbSet<Person> People { get; set; }
         internal DbSet<Contact> Contacts { get; set; }
         internal DbSet<Account> Accounts { get; set; }
-        internal DbSet<Balance> Balances { get; set; }
+        internal DbSet<TransactionLog> TransactionLog { get; set; }
         internal DbSet<Transaction> Transactions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -51,6 +51,25 @@ namespace Infrastructure
                 .HasOne<Person>(contact => contact.Person)
                 .WithMany(person => person.Contacts)
                 .HasForeignKey(contact => contact.PersonId);
+
+            modelBuilder.Entity<Transaction>()
+               .Property(transaction => transaction.CreatedAt)
+               .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<Transaction>()
+               .HasOne<Account>(transaction => transaction.AccountFrom)
+               .WithMany(account => account.TransactionsFrom);
+            modelBuilder.Entity<Transaction>()
+               .HasOne<Account>(transaction => transaction.AccountTo)
+               .WithMany(account => account.TransactionsTo);
+
+            modelBuilder.Entity<TransactionLog>()
+               .Property(transactionLog => transactionLog.CreatedAt)
+               .HasDefaultValue(DateTime.Now);
+            modelBuilder.Entity<TransactionLog>()
+               .HasOne<Account>(transactionLog => transactionLog.Account)
+               .WithMany(account => account.TransactionLogs)
+               .HasForeignKey(transactionLog => transactionLog.AccountId);
+
         }
     }
 }

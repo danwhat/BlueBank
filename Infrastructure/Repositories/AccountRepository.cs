@@ -20,10 +20,10 @@ namespace Infrastructure.Repositories
 
         public Domain.Entities.Account Get(int accountNumber)
         {
-            var account = GetActiveAccountById(accountNumber);
+            var account = GetAccount.GetActiveAccountById(accountNumber, _context);
             if (account == null) return null;
 
-            var currentBalance = account.Balances?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
 
             var accountEntity = new Domain.Entities.Account
             {
@@ -61,7 +61,7 @@ namespace Infrastructure.Repositories
                 return null;
             }
 
-            var currentBalance = account.Balances?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
 
             var accountEntity = new Domain.Entities.Account
             {
@@ -88,7 +88,7 @@ namespace Infrastructure.Repositories
         
         public bool Delete(Domain.Entities.Account acc)
         {
-            var dbAccount = GetActiveAccountById(acc.AccountNumber);
+            var dbAccount = GetAccount.GetActiveAccountById(acc.AccountNumber, _context);
             if (dbAccount == null) return true;
 
             dbAccount.IsActive = false;
@@ -131,7 +131,7 @@ namespace Infrastructure.Repositories
             var dbAccount = GetActiveAccountByOwnerDoc(account.Person.Doc);
             if (dbAccount != null)
             {
-                Console.WriteLine("Cliente já tem conta!");
+                Console.WriteLine("Cliente já tem conta");
                 return null;
             }
 
@@ -154,14 +154,7 @@ namespace Infrastructure.Repositories
             return account;
         }
 
-        #endregion
-
-        private Account GetActiveAccountById(int accNumber)
-        {
-            return _context.Accounts
-                .Where(account => account.Id == accNumber && account.IsActive == true)
-                .FirstOrDefault<Account>();
-        }
+        #endregion        
         private Account GetActiveAccountByOwnerDoc(string docs)
         {
             var dbPerson = GetPerson.ByDocs(docs, _context);
@@ -188,7 +181,7 @@ namespace Infrastructure.Repositories
                 return null;
             }
 
-            var currentBalance = account.Balances?.OrderByDescending(item => item.CreatedAt).First();
+            var currentBalance = account.TransactionLogs?.OrderByDescending(item => item.CreatedAt).First();
 
             var accountEntity = new Domain.Entities.Account
             {

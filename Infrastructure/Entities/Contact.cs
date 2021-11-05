@@ -7,7 +7,6 @@ namespace Infrastructure
     {
         public string PhoneNumber { get; set; }
         public int PersonId { get; set; }
-        public Person Person { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public Person Person { get; set; }        
     }
 }

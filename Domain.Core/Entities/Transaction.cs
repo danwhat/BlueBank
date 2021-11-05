@@ -6,5 +6,9 @@
         public Account AccountTo { get; set; }
         public decimal Value { get; private set; }
 
+        public void SetValue(decimal value)
+        {
+            if (value > 0) Value = value;
+        }
     }
 }
