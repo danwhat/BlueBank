@@ -20,24 +20,18 @@ namespace Domain.Requests
             _accountRepository = new AccountRepository();
         }
 
-        public bool Validate()
+        public bool Validate(Account acc)
         {
-            Account acc = _accountRepository.Read(_dto.AccountNumber);
             if (acc != null) return false;
             return true;
         }
 
         public bool Delete()
         {
-            if (!Validate()) throw new Exception("Erro ao deletar conta.");
-
+            Account acc = _accountRepository.Get(_accountNumber);
+            if (!Validate(acc)) throw new Exception("Erro ao deletar conta.");
             var account = new Infrastructure.Account();
-
-            // var findAccount = _context.Accounts.SingleOrDefault(x => x.Id == account);
-
-            bool result = _accountRepository.Delete(account);
-            // int response = new();
-
+            bool result = _accountRepository.Delete(acc);
             return result;
         }
     }
