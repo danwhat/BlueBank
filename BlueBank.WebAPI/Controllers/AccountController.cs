@@ -40,6 +40,22 @@ namespace BlueBank.WebAPI.Controllers
         //    }
         //}
 
+        [HttpGet("{accountNumber}")]
+        public ObjectResult GetAccount(int accountNumber)
+        {
+            var request = new GetAccountRequest(accountNumber);
+
+            try
+            {
+                var result = request.Get();
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+        }
+
         [HttpDelete("{accountNumber}")]
         public ObjectResult DeleteAccount(int accountNumber)
         {
