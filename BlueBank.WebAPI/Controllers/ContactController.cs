@@ -23,5 +23,20 @@ namespace BlueBank.WebAPI.Controllers
                 return BadRequest("Mensagem de errooooooooo:" + e.Message);
             }
         }
+
+        [HttpDelete("{document}")]
+        public ObjectResult DeleteContact(string document, [FromBody] ContactDto contactDto)
+        {
+            var request = new DeleteContactRequest(document, contactDto.PhoneNumber);
+            try
+            {
+                var result = request.Delete();
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+        }
     }    
 }
