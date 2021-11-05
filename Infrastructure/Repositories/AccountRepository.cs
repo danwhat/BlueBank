@@ -17,7 +17,6 @@ namespace Infrastructure.Repositories
         }
 
         #region Interface methods
-
         public Domain.Entities.Account Get(int accountNumber)
         {
             if (accountNumber < 1) return null;
@@ -27,27 +26,15 @@ namespace Infrastructure.Repositories
 
             var currentBalance = GetBalance.Current(account.TransactionLogs);
 
-            var accountEntity = new Domain.Entities.Account
-            {
-                AccountNumber = account.Id,
-                Balance = currentBalance
-            };
-
-            if (account.Person.Type == 1)
-            {
-                accountEntity.Person = BuildInstance.NaturalPerson(account.Person);
-                return accountEntity;
-            }
-            else
-            {
-                accountEntity.Person = BuildInstance.LegalPerson(account.Person);
-                return accountEntity;
-            }
+            return BuildAccountEntity(account, currentBalance);
         }
 
         public Domain.Entities.Account Get(string ownerDoc)
         {
+            if (string.IsNullOrEmpty(ownerDoc)) return null;
+
             Account account = null;
+
             try
             {
                 account = GetAccount.IfActiveByOwnerDoc(ownerDoc, _context);
@@ -61,27 +48,7 @@ namespace Infrastructure.Repositories
 
             var currentBalance = GetBalance.Current(account.TransactionLogs);
 
-            var accountEntity = new Domain.Entities.Account
-            {
-                AccountNumber = account.Id,
-                Balance = currentBalance
-            };
-
-            if (account.Person.Type == 1)
-            {
-                var personEntity = new Domain.Entities.NaturalPerson
-                { Cpf = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
-                return accountEntity;
-            }
-            else
-            {
-                var personEntity = new Domain.Entities.LegalPerson
-                { Cnpj = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
-                return accountEntity;
-            }
-
+            return BuildAccountEntity(account, currentBalance);
         }
         
         public bool Delete(Domain.Entities.Account acc)
@@ -151,11 +118,9 @@ namespace Infrastructure.Repositories
             account.AccountNumber = dbAccount.Id;
             return account;
         }
-
         #endregion        
 
         #region Extra methods
-
         private Domain.Entities.Account GetByPersonDoc(string docs)
         {
             // validacoes
@@ -181,16 +146,12 @@ namespace Infrastructure.Repositories
 
             if (account.Person.Type == 1)
             {
-                var personEntity = new Domain.Entities.NaturalPerson
-                { Cpf = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
+                accountEntity.Person = BuildInstance.NaturalPerson(account.Person);
                 return accountEntity;
             }
             else
             {
-                var personEntity = new Domain.Entities.LegalPerson
-                { Cnpj = account.Person.Doc, Name = account.Person.Name, Address = account.Person.Address };
-                accountEntity.Person = personEntity;
+                accountEntity.Person = BuildInstance.LegalPerson(account.Person);
                 return accountEntity;
             }
 
@@ -245,7 +206,31 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
-
         #endregion
+
+        private Domain.Entities.Account BuildAccountEntity(Account dbAccount, decimal currentBalance)
+        {
+            var accountEntity = new Domain.Entities.Account
+            {
+                AccountNumber = dbAccount.Id,
+                Balance = currentBalance,
+                CreatedAt = dbAccount.CreatedAt,
+                UpdatedAt = dbAccount.UpdatedAt,
+            };
+
+            if (dbAccount.Person.Type == 1)
+            {
+                accountEntity.Person = BuildInstance.NaturalPerson(dbAccount.Person);
+                return accountEntity;
+            }
+            else
+            {
+                accountEntity.Person = BuildInstance.LegalPerson(dbAccount.Person);
+                return accountEntity;
+            }
+
+
+        }
+
     }
 }
