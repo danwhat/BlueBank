@@ -24,10 +24,10 @@ namespace BlueBank.WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{doc}")]
-        public ObjectResult DeleteContact(string doc, [FromBody] ContactDto contactDto)
+        [HttpDelete("{document}")]
+        public ObjectResult DeleteContact(string document, [FromBody] ContactDto contactDto)
         {
-            var request = new DeleteContactRequest(doc, contactDto.PhoneNumber);
+            var request = new DeleteContactRequest(document, contactDto.PhoneNumber);
             try
             {
                 var result = request.Delete();
