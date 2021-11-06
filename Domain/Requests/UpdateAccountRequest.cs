@@ -19,8 +19,8 @@ namespace Domain.Requests
         public bool Validate()
         {
             // valida se a conta existe
-            //Account acc = _accountRepository.Read(_dto.AccountNumber);
-            //if (acc != null) return false;
+            Account acc = _accountRepository.Get(_dto.AccountNumber);
+            if (acc != null) return false;
             return true;
         }
         

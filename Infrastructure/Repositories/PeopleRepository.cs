@@ -177,6 +177,7 @@ namespace Infrastructure.Repositories
             }
         }
         #endregion
+
         public Domain.Entities.Person Create(Domain.Entities.Person person)
         {
             int personType = GetPerson.Type(person);

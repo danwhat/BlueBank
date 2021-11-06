@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Domain.Core.Interfaces;
-using Domain.Entities;
 using Infrastructure.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +16,38 @@ namespace Infrastructure.Repositories
         }
 
         #region Interface methods
+        public Domain.Entities.Account Create(Domain.Entities.Account account)
+        {
+            var dbPerson = GetOrCreatePerson(account);
+            if (dbPerson != null) return null;
+
+            var dbAccount = GetAccount.IfActiveByOwnerId(account.Person.Id, _context);
+            if (dbAccount != null)
+            {
+                Console.WriteLine("Cliente já tem conta");
+                return null;
+            }
+
+            dbAccount = new Account
+            {
+                Person = dbPerson,
+            };
+
+            try
+            {
+                _context.Accounts.Add(dbAccount);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                Console.WriteLine("Cliente já tem conta!");
+                return null;
+            }
+
+            account.AccountNumber = dbAccount.Id;
+            return account;
+        }
+
         public Domain.Entities.Account Get(int accountNumber)
         {
             if (accountNumber < 1) return null;
@@ -69,36 +100,6 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
                 return false;
             }
-        }
-
-        public Domain.Entities.Account Create(Domain.Entities.Account account)
-        {
-            var dbPerson = GetOrCreatePerson(account);
-
-            var dbAccount = GetAccount.IfActiveByOwnerId(account.Person.Id, _context);
-            if (dbAccount != null)
-            {
-                Console.WriteLine("Cliente já tem conta");
-                return null;
-            }
-
-            dbAccount = new Account
-            {
-                Person = dbPerson,
-            };
-
-            try
-            {
-                _context.Accounts.Add(dbAccount);
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException)
-            {
-                Console.WriteLine("Cliente já tem conta!");
-            }
-
-            account.AccountNumber = dbAccount.Id;
-            return account;
         }
         #endregion        
 

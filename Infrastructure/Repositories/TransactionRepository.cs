@@ -1,10 +1,14 @@
 ﻿
 
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Infrastructure.Shared;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -13,14 +17,18 @@ namespace Infrastructure.Repositories
         private readonly BlueBankContext _context;
 
         public TransactionRepository(BlueBankContext context)
-        {
+    {
             _context = context;
         }
 
         public Domain.Entities.Transaction Create(Domain.Entities.Transaction transaction)
         {
             
-            if (transaction?.AccountFrom?.AccountNumber < 1 && transaction?.AccountTo?.AccountNumber < 1) return null;
+            if (
+                transaction?.AccountFrom?.AccountNumber < 1 
+                && transaction?.AccountTo?.AccountNumber < 1
+                ) return null;
+
             HandleTransaction(transaction);
 
             // from null e to null >>>
@@ -56,31 +64,130 @@ namespace Infrastructure.Repositories
 
         private void HandleTransaction(Domain.Entities.Transaction transaction)
         {
-            bool nullAccountFrom = IsNull(transaction.AccountFrom);
+            bool validAccountFrom = validAccount(transaction.AccountFrom);
+            bool validAccountTo = validAccount(transaction.AccountTo);
 
-            if (!nullAccountFrom) nullAccountFrom = transaction.AccountFrom.AccountNumber < 1;            
-            
-            if (transaction.AccountFrom?.AccountNumber > 0 && transaction.AccountTo?.AccountNumber > 0)
+            if (validAccountFrom && validAccountTo)
             {
-                //Chamar transferencia
+                Transfer(transaction);
             }
-          
-            else if (nullAccountFrom && transaction.AccountTo?.AccountNumber > 0)
+            else if (validAccountFrom && validAccountTo == false)
+            {
+                Withdraw(transaction);
+            }
+            else if (validAccountFrom == false && validAccountTo)
             {
                 Deposit(transaction);
             }
 
-            else if (transaction.AccountFrom?.AccountNumber > 0 && transaction.AccountTo?.AccountNumber == 0)
+        }
+
+        private void Transfer(Domain.Entities.Transaction transaction)
+        {
+            var accountFrom = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
+            if (accountFrom == null) throw new ServerException(Error.AccountFromNotFound);
+
+            var accountTo = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
+            if (accountTo == null) throw new ServerException(Error.AccountToNotFound);
+
+            var accountFromlogs = (ICollection<TransactionLog>)_context
+                .TransactionLog
+                .Where(log => log.AccountId == accountFrom.Id)
+                .ToList();
+
+            decimal accountFromBalance = (GetBalance.Current(accountFromlogs));
+            if (accountFromBalance < transaction.Value) throw new ServerException(Error.InsufficientFunds);
+
+            var accountTologs = (ICollection<TransactionLog>)_context
+                .TransactionLog
+                .Where(log => log.AccountId == accountFrom.Id)
+                .ToList();
+
+            decimal accountToBalance = (GetBalance.Current(accountTologs));
+
+            var dbTransaction = new Transaction()
             {
-                //Chamar saque
+                AccountFrom = accountFrom,
+                AccountTo = accountTo,
+                Value = transaction.Value,
+            };
+
+
+            var transactionLogFrom = new TransactionLog()
+            {
+                Value = transaction.Value,
+                BalanceAfter = accountFromBalance - transaction.Value,
+                Account = accountFrom,
+                Transaction = dbTransaction,
+            };
+
+            var transactionLogTo = new TransactionLog()
+            {
+                Value = transaction.Value,
+                BalanceAfter = accountToBalance + transaction.Value,
+                Account = accountTo,
+                Transaction = dbTransaction,
+            };
+
+            try
+            {
+                _context.Transactions.Add(dbTransaction);
+                _context.TransactionLog.Add(transactionLogFrom);
+                _context.TransactionLog.Add(transactionLogTo);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+        }
+
+        private void Withdraw(Domain.Entities.Transaction transaction)
+        {
+            var account = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
+            if (account == null) throw new ServerException(Error.AccountNotFound);
+
+            var logs = (ICollection<TransactionLog>)_context
+                .TransactionLog
+                .Where(log => log.AccountId == account.Id)
+                .ToList();
+
+            decimal balance = (GetBalance.Current(logs));
+            if (balance < transaction.Value) throw new ServerException(Error.InsufficientFunds);
+            
+            var dbTransaction = new Transaction()
+            {
+                AccountFrom = account,
+                Value = transaction.Value,
+            };
+
+
+            var transactionLog = new TransactionLog()
+            {
+                Value = transaction.Value,
+                BalanceAfter = balance - transaction.Value,
+                Account = account,
+                Transaction = dbTransaction,
+            };
+
+            try
+            {
+                _context.Transactions.Add(dbTransaction);
+                _context.TransactionLog.Add(transactionLog);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
             }
         }
 
         private void Deposit(Domain.Entities.Transaction transaction)
         {
+            if (IsNull(transaction.AccountTo)) throw new ServerException(Error.AccountInvalidId);
 
             var account = GetAccount.IfActiveById(transaction.AccountTo.AccountNumber, _context);
-            if (IsNull(account)) return;
+            if (account == null) throw new ServerException(Error.AccountNotFound);
 
             var dbTransaction = new Transaction()
             {
@@ -111,13 +218,19 @@ namespace Infrastructure.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
             }
         }
 
         private bool IsNull(Object obj)
         {
             return obj == null;
+        }
+
+        private bool validAccount(Domain.Entities.Account account)
+        {
+            var nullAccount = account?.AccountNumber < 1;
+            return nullAccount;
         }
     }
 }
