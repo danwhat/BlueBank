@@ -1,6 +1,7 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Core.Exceptions;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 
@@ -21,26 +22,15 @@ namespace Domain.Requests
         private readonly AccountRepository _accountRepository;
         private readonly TransactionRepository _transactionRepositoy;
 
-        public bool Validate()
+        public void Validation()
         {
-            try
-            {
-                Account acc = _accountRepository.Get(_accountNumber);
-                // Checar se tem saldo
-                if (_dto.Value > acc.Balance) return false;
-            }
-            catch(ServerException e)
-            {
-                Console.WriteLine(e.Message);// valida se a conta existe
-                return false;
-            }
-            // validado
-            return true;
+            Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
+            Validations.SufficientBalanceValidation(_accountRepository, _accountNumber, _dto.Value);
         }
-        
+
         public TransactionResponseDTO Withdraw()
         {
-            if (!Validate()) throw new Exception("Não passou na validação");
+            Validation();
 
             Account acc = _accountRepository.Get(_accountNumber);
 

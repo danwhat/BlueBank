@@ -1,6 +1,7 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Core.Exceptions;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -23,22 +24,13 @@ namespace Domain.Requests
             _personRepository = new PersonRepository();
         }
 
-        private bool IsPhoneNumberExist(string phoneNumber, Person person)
-        {
-            return person.PhoneNumbers.Contains(phoneNumber);
-        }
+
 
         public void valid()
         {
-            try
-            {
-                Person person = _personRepository.Get(_doc);
-                if (!IsPhoneNumberExist(_phoneNumber, person)) throw new Exception("Esse número de telefone não está cadastrado");
-            }
-            catch (ServerException e)
-            {
-                throw new Exception("Não existe nenhuma pessoa cadastrada com esse documento!");
-            }
+            Person person = (Person)Activator.CreateInstance(typeof(Person));
+            Validations.ThisPersonExistsValidation(_personRepository, _doc, out person);
+            Validations.ThisPersonHasThatPhoneNumberValidation(_phoneNumber, person);
         }
 
         public Person Delete()

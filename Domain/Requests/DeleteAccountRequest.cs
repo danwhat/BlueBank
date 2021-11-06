@@ -1,5 +1,7 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -19,17 +21,17 @@ namespace Domain.Requests
             _accountNumber = accountNumber;
             _accountRepository = new AccountRepository();
         }
+        
 
-        public bool Validate(Account acc)
+        public void Validation()
         {
-            if (acc != null) return false;
-            return true;
+            Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
         }
 
         public bool Delete()
         {
+            Validation();
             Account acc = _accountRepository.Get(_accountNumber);
-            if (!Validate(acc)) throw new Exception("Erro ao deletar conta.");
             var account = new Infrastructure.Account();
             bool result = _accountRepository.Delete(acc);
             return result;

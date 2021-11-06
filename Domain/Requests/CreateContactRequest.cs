@@ -1,5 +1,6 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 
@@ -20,14 +21,17 @@ namespace Domain.Requests
         private readonly AccountRepository _accountRepository;
         private readonly PersonRepository _personRepository;
 
-        public bool Validate()
+        public void Validation()
         {
-            return true;
+            Validations.PhoneNumberValidation(_phone.PhoneNumber);
+            Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
+            var acc = _accountRepository.Get(_accountNumber);
+            Validations.ThisPersonHasNotThatPhoneNumberValidation(_phone.PhoneNumber, acc.Person);
         }
 
         public PersonResponseDto Create()
         {
-            if (!Validate()) throw new Exception("Algo de errado");
+            Validation();
 
             var doc = _accountRepository.Get(_accountNumber).Person.Doc;
 

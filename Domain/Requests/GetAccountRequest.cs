@@ -1,4 +1,5 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Entities;
 using Infrastructure.Repositories;
 using System;
@@ -22,9 +23,15 @@ namespace Domain.Requests
 
         public Account Get()
         {
-            Account result = _accountRepository.Get(_accountNumber);
-            //Account result = new();
-            return result;
+            try
+            {
+                Account result = _accountRepository.Get(_accountNumber);
+                return result;
+            }
+            catch (ServerException)
+            {
+                throw new InvalidInputException("Conta não encontrada.");
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 
@@ -20,23 +21,16 @@ namespace Domain.Requests
         private readonly AccountRepository _accountRepository;
         private readonly TransactionRepository _transactionRepositoy;
 
-        public bool Validate()
-        {
-            Account accFrom = _accountRepository.Get(_accountNumber);
-            Account accTo = _accountRepository.Get(_dto.AccountNumberTo);
-            // valida se a conta origem existe
-            if (accFrom == null) return false;
-            // valida se a conta destino existe
-            if (accTo == null) return false;
-            // Checar se tem saldo
-            if (_dto.Value > accFrom.Balance) return false;
-            // validado
-            return true;
+        public void Validation()
+        {         
+            Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
+            Validations.ThisAccountExistsValidation(_accountRepository, _dto.AccountNumberTo);
+            Validations.SufficientBalanceValidation(_accountRepository, _accountNumber, _dto.Value);
         }
         
         public TransactionResponseDTO Transfer()
         {
-            if (!Validate()) throw new Exception("Não passou na validação");
+            Validation();
 
             Account accFrom = _accountRepository.Get(_accountNumber);
             Account accTo = _accountRepository.Get(_dto.AccountNumberTo);
