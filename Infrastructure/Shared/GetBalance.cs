@@ -11,7 +11,7 @@ namespace Infrastructure.Shared
         internal static decimal Current(ICollection<TransactionLog> transactionLogs)
         {
             var dbBalance = transactionLogs?
-                .OrderBy(item => item.CreatedAt)
+                .OrderByDescending(item => item.CreatedAt)
                 .FirstOrDefault<TransactionLog>();
 
             return dbBalance?.BalanceAfter ?? 0m;

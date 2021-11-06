@@ -57,7 +57,7 @@ namespace Infrastructure.Repositories
 
             var currentBalance = GetBalance.Current(account.TransactionLogs);
 
-            return BuildAccountEntity(account, currentBalance);
+            return BuildInstance.AccountEntity(account, currentBalance);
         }
 
         public Domain.Entities.Account Get(string ownerDoc)
@@ -79,7 +79,7 @@ namespace Infrastructure.Repositories
 
             var currentBalance = GetBalance.Current(account.TransactionLogs);
 
-            return BuildAccountEntity(account, currentBalance);
+            return BuildInstance.AccountEntity(account, currentBalance);
         }
         
         public bool Delete(Domain.Entities.Account acc)
@@ -189,32 +189,7 @@ namespace Infrastructure.Repositories
                 Console.WriteLine(e.Message);
             }
         }
-        #endregion
-
-        private Domain.Entities.Account BuildAccountEntity(Account dbAccount, decimal currentBalance)
-        {
-            var accountEntity = new Domain.Entities.Account
-            {
-                AccountNumber = dbAccount.Id,
-                Balance = currentBalance,
-                CreatedAt = dbAccount.CreatedAt,
-                UpdatedAt = dbAccount.UpdatedAt,
-            };
-
-            if (dbAccount.Person.Type == 1)
-            {
-                accountEntity.Person = BuildInstance.NaturalPerson(dbAccount.Person);
-                return accountEntity;
-            }
-            else
-            {
-                accountEntity.Person = BuildInstance.LegalPerson(dbAccount.Person);
-                return accountEntity;
-            }
-
-
-        }
-
+        #endregion        
         private Person GetOrCreatePerson(Domain.Entities.Account account)
         {
             int personType = GetPerson.Type(account.Person);
@@ -247,3 +222,4 @@ namespace Infrastructure.Repositories
         }
     }
 }
+

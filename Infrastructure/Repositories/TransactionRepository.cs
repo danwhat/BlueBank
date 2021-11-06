@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -17,55 +15,128 @@ namespace Infrastructure.Repositories
         private readonly BlueBankContext _context;
 
         public TransactionRepository(BlueBankContext context)
-    {
+        {
             _context = context;
         }
 
         public Domain.Entities.Transaction Create(Domain.Entities.Transaction transaction)
         {
-            
+
             if (
-                transaction?.AccountFrom?.AccountNumber < 1 
+                transaction?.AccountFrom?.AccountNumber < 1
                 && transaction?.AccountTo?.AccountNumber < 1
                 ) return null;
 
             HandleTransaction(transaction);
 
-            // from null e to null >>>
-            //identificar a transação
-            //validações
-            //montar transação de infra
-            //montar log de transação
-            //salvar transação
-            //salvar log de transação                  
-
             return transaction;
-        }
-
-        public List<Domain.Entities.Transaction> GetByAcc(int accountNumber)
-        {
-            throw new NotImplementedException();
         }
 
         public List<Domain.Entities.Transaction> GetByDoc(string Doc)
         {
-            throw new NotImplementedException();
+            try
+            {
+                DateTime limitDate = DateTime.Now.AddDays(-30);
+
+                var dbAccount = GetAccount.IfActiveByOwnerDoc(Doc, _context);
+                var dbAccountTransaction = _context.Transactions
+                    .Where(transaction =>
+                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
+                        && transaction.CreatedAt <= limitDate)
+                    .OrderBy(transaction => transaction.CreatedAt);
+
+                return dbAccountTransaction
+                    .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public List<Domain.Entities.Transaction> GetByAcc(int accountNumber)
+        {
+            try
+            {
+                DateTime limitDate = DateTime.Now.AddDays(-30);
+
+                var dbAccount = GetAccount.IfActiveById(accountNumber, _context);
+                var dbAccountTransaction = _context.Transactions
+                    .Where(transaction =>
+                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
+                        && transaction.CreatedAt <= limitDate)
+                    .OrderBy(transaction => transaction.CreatedAt);
+
+                return dbAccountTransaction
+                    .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<Domain.Entities.Transaction> GetByPeriod(DateTime initial, DateTime final, string Doc)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Validate.TransactionDate(initial, final);
+
+                var dbAccount = GetAccount.IfActiveByOwnerDoc(Doc, _context);
+                var dbAccountTransaction = _context.Transactions
+                    .Where(transaction =>
+                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
+                        && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
+                    .OrderBy(transaction => transaction.CreatedAt);
+
+                return dbAccountTransaction
+                    .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
+            }
+            catch (ServerException e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ServerException(e.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<Domain.Entities.Transaction> GetByPeriod(DateTime initial, DateTime final, int accountNumber)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Validate.TransactionDate(initial, final);
+
+                var dbAccount = GetAccount.IfActiveById(accountNumber, _context);
+                var dbAccountTransaction = _context.Transactions
+                    .Where(transaction =>
+                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
+                        && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
+                    .OrderBy(transaction => transaction.CreatedAt);
+
+                return dbAccountTransaction
+                    .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
+            }
+            catch (ServerException e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ServerException(e.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
+        #region Helpers
         private void HandleTransaction(Domain.Entities.Transaction transaction)
         {
-            bool validAccountFrom = validAccount(transaction.AccountFrom);
-            bool validAccountTo = validAccount(transaction.AccountTo);
+            if (transaction.Value <= 0) return;
+
+            bool validAccountFrom = Validate.Account(transaction.AccountFrom);
+            bool validAccountTo = Validate.Account(transaction.AccountTo);
 
             if (validAccountFrom && validAccountTo)
             {
@@ -90,20 +161,20 @@ namespace Infrastructure.Repositories
             var accountTo = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
             if (accountTo == null) throw new ServerException(Error.AccountToNotFound);
 
-            var accountFromlogs = (ICollection<TransactionLog>)_context
+            var accountFromLogs = (ICollection<TransactionLog>)_context
                 .TransactionLog
                 .Where(log => log.AccountId == accountFrom.Id)
                 .ToList();
 
-            decimal accountFromBalance = (GetBalance.Current(accountFromlogs));
+            decimal accountFromBalance = (GetBalance.Current(accountFromLogs));
             if (accountFromBalance < transaction.Value) throw new ServerException(Error.InsufficientFunds);
 
-            var accountTologs = (ICollection<TransactionLog>)_context
+            var accountToLogs = (ICollection<TransactionLog>)_context
                 .TransactionLog
                 .Where(log => log.AccountId == accountFrom.Id)
                 .ToList();
 
-            decimal accountToBalance = (GetBalance.Current(accountTologs));
+            decimal accountToBalance = (GetBalance.Current(accountToLogs));
 
             var dbTransaction = new Transaction()
             {
@@ -154,7 +225,7 @@ namespace Infrastructure.Repositories
 
             decimal balance = (GetBalance.Current(logs));
             if (balance < transaction.Value) throw new ServerException(Error.InsufficientFunds);
-            
+
             var dbTransaction = new Transaction()
             {
                 AccountFrom = account,
@@ -184,7 +255,7 @@ namespace Infrastructure.Repositories
 
         private void Deposit(Domain.Entities.Transaction transaction)
         {
-            if (IsNull(transaction.AccountTo)) throw new ServerException(Error.AccountInvalidId);
+            if (Validate.IsNull(transaction.AccountTo)) throw new ServerException(Error.AccountInvalidId);
 
             var account = GetAccount.IfActiveById(transaction.AccountTo.AccountNumber, _context);
             if (account == null) throw new ServerException(Error.AccountNotFound);
@@ -194,7 +265,7 @@ namespace Infrastructure.Repositories
                 AccountTo = account,
                 Value = transaction.Value,
             };
-            
+
             var logs = (ICollection<TransactionLog>)_context
                 .TransactionLog
                 .Where(log => log.AccountId == account.Id)
@@ -221,16 +292,6 @@ namespace Infrastructure.Repositories
                 Debug.WriteLine(e.Message);
             }
         }
-
-        private bool IsNull(Object obj)
-        {
-            return obj == null;
-        }
-
-        private bool validAccount(Domain.Entities.Account account)
-        {
-            var nullAccount = account?.AccountNumber < 1;
-            return nullAccount;
-        }
+        #endregion
     }
 }
