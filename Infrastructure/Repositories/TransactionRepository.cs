@@ -39,11 +39,7 @@ namespace Infrastructure.Repositories
                 DateTime limitDate = DateTime.Now.AddDays(-30);
 
                 var dbAccount = GetAccount.IfActiveByOwnerDoc(Doc, _context);
-                var dbAccountTransaction = _context.Transactions
-                    .Where(transaction =>
-                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
-                        && transaction.CreatedAt <= limitDate)
-                    .OrderBy(transaction => transaction.CreatedAt);
+                var dbAccountTransaction = GetAccountTransactions(limitDate, DateTime.Now, dbAccount);
 
                 return dbAccountTransaction
                     .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
@@ -61,11 +57,7 @@ namespace Infrastructure.Repositories
                 DateTime limitDate = DateTime.Now.AddDays(-30);
 
                 var dbAccount = GetAccount.IfActiveById(accountNumber, _context);
-                var dbAccountTransaction = _context.Transactions
-                    .Where(transaction =>
-                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
-                        && transaction.CreatedAt <= limitDate)
-                    .OrderBy(transaction => transaction.CreatedAt);
+                var dbAccountTransaction = GetAccountTransactions(limitDate, DateTime.Now, dbAccount);
 
                 return dbAccountTransaction
                     .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
@@ -83,11 +75,7 @@ namespace Infrastructure.Repositories
                 Validate.TransactionDate(initial, final);
 
                 var dbAccount = GetAccount.IfActiveByOwnerDoc(Doc, _context);
-                var dbAccountTransaction = _context.Transactions
-                    .Where(transaction =>
-                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
-                        && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
-                    .OrderBy(transaction => transaction.CreatedAt);
+                var dbAccountTransaction = GetAccountTransactions(initial, final, dbAccount);
 
                 return dbAccountTransaction
                     .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
@@ -110,11 +98,7 @@ namespace Infrastructure.Repositories
                 Validate.TransactionDate(initial, final);
 
                 var dbAccount = GetAccount.IfActiveById(accountNumber, _context);
-                var dbAccountTransaction = _context.Transactions
-                    .Where(transaction =>
-                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
-                        && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
-                    .OrderBy(transaction => transaction.CreatedAt);
+                var dbAccountTransaction = GetAccountTransactions(initial, final, dbAccount);
 
                 return dbAccountTransaction
                     .Select(dbTransaction => BuildInstance.TransactionEntity(dbTransaction)).ToList();
@@ -292,6 +276,16 @@ namespace Infrastructure.Repositories
                 Debug.WriteLine(e.Message);
             }
         }
+
+        private List<Transaction> GetAccountTransactions(DateTime initial, DateTime final, Account dbAccount)
+        {
+            return _context.Transactions
+            .Where(transaction =>
+                        (transaction.AccountFrom.Id == dbAccount.Id || transaction.AccountTo.Id == dbAccount.Id)
+                        && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
+                    .OrderBy(transaction => transaction.CreatedAt).ToList();
+        }
+           
         #endregion
     }
 }
