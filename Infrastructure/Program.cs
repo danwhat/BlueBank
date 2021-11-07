@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Infrastructure.Repositories;
+﻿using Infrastructure.Repositories;
 
 namespace Infrastructure
 {
@@ -9,7 +7,7 @@ namespace Infrastructure
         static void Main(string[] args)
         {
             var context = new BlueBankContext();
-            var peopleRepository = new PeopleRepository(context);
+            var peopleRepository = new PersonRepository(context);
             var accountRepository = new AccountRepository(context);
             var transactionRepository = new TransactionRepository(context);
 

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Infrastructure.Shared;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -19,74 +20,49 @@ namespace Infrastructure.Repositories
         public Domain.Entities.Account Create(Domain.Entities.Account account)
         {
             var dbPerson = GetOrCreatePerson(account);
-            if (dbPerson != null) return null;
-
-            var dbAccount = GetAccount.IfActiveByOwnerId(account.Person.Id, _context);
-            if (dbAccount != null)
-            {
-                Console.WriteLine("Cliente já tem conta");
-                return null;
-            }
-
-            dbAccount = new Account
-            {
-                Person = dbPerson,
-            };
-
+            var dbAccount = GetAccount.IfActiveOrDefault(account.Person.Id, _context);
+            if (dbAccount != null) throw new ServerException(Error.AccountAlreadyExists);
+   
+            dbAccount = new Account { Person = dbPerson };
+            
             try
             {
                 _context.Accounts.Add(dbAccount);
                 _context.SaveChanges();
-            }
-            catch (DbUpdateException)
-            {
-                Console.WriteLine("Cliente já tem conta!");
-                return null;
-            }
 
-            account.AccountNumber = dbAccount.Id;
-            return account;
+                account.AccountNumber = dbAccount.Id;
+                return account;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.AccountCreateFail);
+            }
         }
 
         public Domain.Entities.Account Get(int accountNumber)
         {
-            if (accountNumber < 1) return null;
+            if (accountNumber < 1) throw new ServerException(Error.AccountInvalidId);
 
             var account = GetAccount.IfActiveById(accountNumber, _context);
-            if (account == null) return null;
-
             var currentBalance = GetBalance.Current(account.TransactionLogs);
-
             return BuildInstance.AccountEntity(account, currentBalance);
         }
 
         public Domain.Entities.Account Get(string ownerDoc)
         {
-            if (string.IsNullOrEmpty(ownerDoc)) return null;
+            if (string.IsNullOrEmpty(ownerDoc)) throw new ServerException(Error.PersonInvalidDoc);
 
-            Account account;
-
-            try
-            {
-                account = GetAccount.IfActiveByOwnerDoc(ownerDoc, _context);
-                if (account == null) return null;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-
+            var account = GetAccount.IfActiveByOwnerDoc(ownerDoc, _context);
             var currentBalance = GetBalance.Current(account.TransactionLogs);
-
             return BuildInstance.AccountEntity(account, currentBalance);
         }
         
         public bool Delete(Domain.Entities.Account acc)
         {
-            var dbAccount = GetAccount.IfActiveById(acc.AccountNumber, _context);
-            if (dbAccount == null) return true;
+            if (acc.AccountNumber < 1) throw new ServerException(Error.AccountInvalidId);
 
+            var dbAccount = GetAccount.IfActiveById(acc.AccountNumber, _context);
             dbAccount.IsActive = false;
 
             try
@@ -97,7 +73,7 @@ namespace Infrastructure.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return false;
             }
         }
@@ -169,7 +145,7 @@ namespace Infrastructure.Repositories
 
         private void Remove(string docs)
         {
-            var dbPerson = GetPerson.IfActive(docs, _context);
+            var dbPerson = GetPerson.ByDocsIfActive(docs, _context);
             if (dbPerson == null) throw new Exception();
 
             var dbAccount = _context.Accounts
@@ -190,12 +166,13 @@ namespace Infrastructure.Repositories
             }
         }
         #endregion        
+        
         private Person GetOrCreatePerson(Domain.Entities.Account account)
         {
             int personType = GetPerson.Type(account.Person);
-            if (personType == 0) return null;
+            if (personType == 0) throw new ServerException(Error.PersonInvalidType);
 
-            var dbPerson = GetPerson.ByDocs(account.Person.Doc, _context);
+            var dbPerson = GetPerson.ByDocsOrDefault(account.Person.Doc, _context);
             if (dbPerson == null)
             {
                 dbPerson = new Person

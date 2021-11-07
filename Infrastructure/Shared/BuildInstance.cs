@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Domain.Core.Exceptions;
 using Domain.Entities;
 
 namespace Infrastructure.Shared
@@ -34,8 +35,6 @@ namespace Infrastructure.Shared
 
         internal static Domain.Entities.Account AccountEntity(Account dbAccount, decimal currentBalance = 0)
         {
-            if (Validate.IsNull(dbAccount)) return null;
-
             var accountEntity = new Domain.Entities.Account
             {
                 AccountNumber = dbAccount.Id,
@@ -44,16 +43,11 @@ namespace Infrastructure.Shared
                 UpdatedAt = dbAccount.UpdatedAt,
             };
 
-            if (dbAccount.Person.Type == 1)
-            {
-                accountEntity.Person = BuildInstance.NaturalPerson(dbAccount.Person);
-                return accountEntity;
-            }
-            else
-            {
-                accountEntity.Person = BuildInstance.LegalPerson(dbAccount.Person);
-                return accountEntity;
-            }
+            accountEntity.Person = (dbAccount.Person.Type == 1)
+                ? BuildInstance.NaturalPerson(dbAccount.Person)
+                : BuildInstance.LegalPerson(dbAccount.Person);
+
+            return accountEntity;
         }
 
         internal static Domain.Entities.Transaction TransactionEntity(Transaction dbTransaction)
