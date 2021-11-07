@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Domain.Core.Exceptions;
 using Domain.Entities;
 
 namespace Infrastructure.Shared
@@ -34,8 +35,6 @@ namespace Infrastructure.Shared
 
         internal static Domain.Entities.Account AccountEntity(Account dbAccount, decimal currentBalance = 0)
         {
-            if (Validate.IsNull(dbAccount)) return null;
-
             var accountEntity = new Domain.Entities.Account
             {
                 AccountNumber = dbAccount.Id,

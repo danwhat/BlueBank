@@ -37,19 +37,29 @@ namespace Infrastructure.Shared
         internal static Account IfActiveByOwnerDoc(string ownerDoc, BlueBankContext context)
         {
             if (string.IsNullOrWhiteSpace(ownerDoc)) throw new ServerException(Error.PersonInvalidDoc);
+            
             var dbPerson = GetPerson.IfActive(ownerDoc, context);
-            if (Validate.IsNull(dbPerson)) throw new ServerException(Error.PersonNotFound);
 
+            return IfActiveByOwnerId(dbPerson.Id, context);
+        }
+
+        internal static Account IfActiveOrDefault(int accNumber, BlueBankContext context)
+        {
+            Account dbAccount = null;
             try
             {
-                var dbAccount = IfActiveByOwnerId(dbPerson.Id, context);
-                return dbAccount;
+                return context.Accounts
+                    .Where(account => account.Id == accNumber && account.IsActive == true)
+                    .Include(account => account.Person)
+                        .ThenInclude(person => person.Contacts)
+                    .Include(account => account.TransactionLogs)
+                    .FirstOrDefault<Account>();
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                throw new ServerException(Error.AccountNotFound);
-            }           
+                return dbAccount;
+            }
         }
     }
 }

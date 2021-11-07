@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Infrastructure.Shared;
 
@@ -19,165 +21,132 @@ namespace Infrastructure.Repositories
         public Domain.Entities.Person Update(string doc, Domain.Entities.Person updatePerson)
         {
             int personType = GetPerson.Type(updatePerson);
-            if (personType == 0) return null;
-
-            var dbPerson = GetPerson.ByDocs(doc, _context);
-            if (dbPerson == null) return null;
-
-            dbPerson.Name = updatePerson.Name;
-            dbPerson.Address = updatePerson.Address;
-            dbPerson.Doc = updatePerson.Doc;
-            dbPerson.UpdatedAt = DateTime.Now;
+            if (personType == 0) throw new ServerException(Error.PersonInvalidType);
 
             try
             {
-                var result = _context.People.Update(dbPerson);
+                var dbPerson = GetPerson.ByDocs(doc, _context);
+                dbPerson.Name = updatePerson.Name;
+                dbPerson.Address = updatePerson.Address;
+                dbPerson.Doc = updatePerson.Doc;
+                dbPerson.UpdatedAt = DateTime.Now;
+
+                _context.People.Update(dbPerson);
                 _context.SaveChanges();
+
+                return (dbPerson.Type == 1)
+                    ? BuildInstance.NaturalPerson(dbPerson)
+                    : BuildInstance.LegalPerson(dbPerson);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-
-            if (dbPerson.Type == 1)
-            {
-                return BuildInstance.NaturalPerson(dbPerson);
-            }
-            else
-            {
-                return BuildInstance.LegalPerson(dbPerson);
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonUpdateFail);
             }
         }
 
         public Domain.Entities.Person Get(string doc)
         {
-            var dbPerson = GetPerson.IfActive(doc, _context);
-            if (dbPerson == null) return null;
-
-            if (dbPerson.Type == 1)
+            try
             {
-                return BuildInstance.NaturalPerson(dbPerson);
+                var dbPerson = GetPerson.IfActive(doc, _context);
+                return (dbPerson.Type == 1)
+                    ? BuildInstance.NaturalPerson(dbPerson)
+                    : BuildInstance.LegalPerson(dbPerson);
             }
-            else
+            catch (Exception e)
             {
-                return BuildInstance.LegalPerson(dbPerson);
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonGetFail);
             }
         }
 
         public Domain.Entities.Person UpdateContactList(string doc, List<string> list)
         {
             var dbPerson = GetPerson.ByDocs(doc, _context);
-            if (dbPerson == null) return null;
 
             try
             {
                 _context.Contacts
-                    .RemoveRange
-                    (
-                        _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id)
-                    );
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
+                    .RemoveRange(
+                        _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id));
+                
+                dbPerson.Contacts = list
+                    .Select(phoneNumber => new Contact {
+                        Person = dbPerson,
+                        PhoneNumber = phoneNumber })
+                    .ToList();
 
-            dbPerson.Contacts = list
-                .Select(phoneNumber => new Contact { Person = dbPerson, PhoneNumber = phoneNumber })
-                .ToList();
-
-            dbPerson.UpdatedAt = DateTime.Now;
-
-            try
-            {
+                dbPerson.UpdatedAt = DateTime.Now;
                 _context.People.Update(dbPerson);
                 _context.SaveChanges();
+
+                return (dbPerson.Type == 1)
+                    ? BuildInstance.NaturalPerson(dbPerson)
+                    : BuildInstance.LegalPerson(dbPerson);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-
-            if (dbPerson.Type == 1)
-            {
-                return BuildInstance.NaturalPerson(dbPerson);
-            }
-            else
-            {
-                return BuildInstance.LegalPerson(dbPerson);
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonUpdateFail);
             }
         }
 
         public Domain.Entities.Person RemoveContact(string doc, string phoneNumber)
         {
             var dbPerson = GetPerson.ByDocs(doc, _context);
-            if (dbPerson == null) return null;
-
-            var contact = _context.Contacts
-                .Where(curr => curr.PersonId == dbPerson.Id && curr.PhoneNumber == phoneNumber)
-                .FirstOrDefault<Contact>();
-            if (contact == null) return null;
 
             try
             {
+                var contact = _context.Contacts
+                    .Where(curr => curr.PersonId == dbPerson.Id && curr.PhoneNumber == phoneNumber)
+                    .FirstOrDefault<Contact>();
+                if (contact == null) return (dbPerson.Type == 1)
+                    ? BuildInstance.NaturalPerson(dbPerson)
+                    : BuildInstance.LegalPerson(dbPerson);
+
                 _context.Contacts.Remove(contact);
                 _context.SaveChanges();
+                return (dbPerson.Type == 1)
+                    ? BuildInstance.NaturalPerson(dbPerson)
+                    : BuildInstance.LegalPerson(dbPerson);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                return null;
+                throw new ServerException(Error.PersonUpdateFail);
             }
-
-            if (dbPerson.Type == 1)
-            {
-                return BuildInstance.NaturalPerson(dbPerson);
-            }
-            else
-            {
-                return BuildInstance.LegalPerson(dbPerson);
-            }
-
         }
 
         public Domain.Entities.Person AddContact(string doc, string phoneNumber)
         {
             var dbPerson = GetPerson.ByDocs(doc, _context);
-            if (dbPerson == null) return null;
 
-            var contactDuplicate = _context.Contacts
-                .Where(contact => contact.PersonId == dbPerson.Id && contact.PhoneNumber == phoneNumber)
-                .FirstOrDefault<Contact>();
-            if (contactDuplicate == null)
+            try
             {
-                var contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
+                var contact = _context.Contacts
+                    .Where(contact => contact.PersonId == dbPerson.Id && contact.PhoneNumber == phoneNumber)
+                    .FirstOrDefault<Contact>();
+                if (contact != null) return (dbPerson.Type == 1)
+                   ? BuildInstance.NaturalPerson(dbPerson)
+                   : BuildInstance.LegalPerson(dbPerson);
 
-                try
-                {
-                    _context.Contacts.Add(contact);
-                    _context.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    return null;
-                }
+                contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
+                _context.Contacts.Add(contact);
+                _context.SaveChanges();
+                return (dbPerson.Type == 1)
+                        ? BuildInstance.NaturalPerson(dbPerson)
+                        : BuildInstance.LegalPerson(dbPerson);
             }
-
-            if (dbPerson.Type == 1)
+            catch (Exception e)
             {
-                return BuildInstance.NaturalPerson(dbPerson);
-            }
-            else
-            {
-                return BuildInstance.LegalPerson(dbPerson);
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonUpdateFail);
             }
         }
         #endregion
 
+        #region Extra methods
         public Domain.Entities.Person Create(Domain.Entities.Person person)
         {
             int personType = GetPerson.Type(person);
@@ -205,8 +174,7 @@ namespace Infrastructure.Repositories
 
             return person;
         }
-
-        #region Extra methods
+        
         private Domain.Entities.Person GetByDoc(string docs)
         {            
             var dbPerson = GetPerson.ByDocs(docs, _context);
