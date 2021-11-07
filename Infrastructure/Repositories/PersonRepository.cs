@@ -23,6 +23,12 @@ namespace Infrastructure.Repositories
             int personType = GetPerson.Type(updatePerson);
             if (personType == 0) throw new ServerException(Error.PersonInvalidType);
             
+            if (doc != updatePerson.Doc)
+            {
+                var dbPersonNewDoc = GetPerson.ByDocsOrDefault(updatePerson.Doc, _context);
+                if (dbPersonNewDoc != null) throw new ServerException(Error.PersonInvalidDoc);
+            }
+
             var dbPerson = GetPerson.ByDocs(doc, _context);
 
             dbPerson.Name = updatePerson.Name;
