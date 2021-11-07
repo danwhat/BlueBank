@@ -43,16 +43,11 @@ namespace Infrastructure.Shared
                 UpdatedAt = dbAccount.UpdatedAt,
             };
 
-            if (dbAccount.Person.Type == 1)
-            {
-                accountEntity.Person = BuildInstance.NaturalPerson(dbAccount.Person);
-                return accountEntity;
-            }
-            else
-            {
-                accountEntity.Person = BuildInstance.LegalPerson(dbAccount.Person);
-                return accountEntity;
-            }
+            accountEntity.Person = (dbAccount.Person.Type == 1)
+                ? BuildInstance.NaturalPerson(dbAccount.Person)
+                : BuildInstance.LegalPerson(dbAccount.Person);
+
+            return accountEntity;
         }
 
         internal static Domain.Entities.Transaction TransactionEntity(Transaction dbTransaction)

@@ -4,7 +4,6 @@ using System.Linq;
 using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Infrastructure.Shared;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -51,9 +50,7 @@ namespace Infrastructure.Repositories
             if (accountNumber < 1) throw new ServerException(Error.AccountInvalidId);
 
             var account = GetAccount.IfActiveById(accountNumber, _context);
-
             var currentBalance = GetBalance.Current(account.TransactionLogs);
-
             return BuildInstance.AccountEntity(account, currentBalance);
         }
 
@@ -70,11 +67,11 @@ namespace Infrastructure.Repositories
         {
             if (acc.AccountNumber < 1) throw new ServerException(Error.AccountInvalidId);
 
+            var dbAccount = GetAccount.IfActiveById(acc.AccountNumber, _context);
+            dbAccount.IsActive = false;
+
             try
             {
-                var dbAccount = GetAccount.IfActiveById(acc.AccountNumber, _context);
-                dbAccount.IsActive = false;
-
                 _context.Accounts.Update(dbAccount);
                 _context.SaveChanges();
                 return true;
@@ -153,7 +150,7 @@ namespace Infrastructure.Repositories
 
         private void Remove(string docs)
         {
-            var dbPerson = GetPerson.IfActive(docs, _context);
+            var dbPerson = GetPerson.ByDocsIfActive(docs, _context);
             if (dbPerson == null) throw new Exception();
 
             var dbAccount = _context.Accounts

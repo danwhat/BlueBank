@@ -21,13 +21,14 @@ namespace Infrastructure.Shared
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonGetFail);
             }
 
             if (Validate.IsNull(dbPerson)) throw new ServerException(Error.PersonNotFound);
             return dbPerson;
         }
 
-        internal static Person IfActive(string docs, BlueBankContext context)
+        internal static Person ByDocsIfActive(string docs, BlueBankContext context)
         {
             Person dbPerson = null;
             try
@@ -40,15 +41,16 @@ namespace Infrastructure.Shared
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonGetFail);
             }
-
+            
             if (Validate.IsNull(dbPerson)) throw new ServerException(Error.PersonNotFound);
             return dbPerson;
+
         }
 
         internal static Person ByDocsOrDefault(string docs, BlueBankContext context)
         {
-            Person dbPerson = null;
             try
             {
                 return context.People
@@ -59,7 +61,7 @@ namespace Infrastructure.Shared
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                return dbPerson;
+                return new Person();
             }
         }
 

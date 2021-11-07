@@ -49,7 +49,7 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                var dbPerson = GetPerson.IfActive(doc, _context);
+                var dbPerson = GetPerson.ByDocsIfActive(doc, _context);
                 return (dbPerson.Type == 1)
                     ? BuildInstance.NaturalPerson(dbPerson)
                     : BuildInstance.LegalPerson(dbPerson);
