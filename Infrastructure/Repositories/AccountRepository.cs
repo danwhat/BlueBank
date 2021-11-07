@@ -33,11 +33,6 @@ namespace Infrastructure.Repositories
                 account.AccountNumber = dbAccount.Id;
                 return account;
             }
-            catch (ServerException e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
-            }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);

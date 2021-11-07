@@ -27,6 +27,7 @@ namespace Infrastructure.Shared
             }
 
             if (Validate.IsNull(dbAccount)) throw new ServerException(Error.AccountNotFound);
+
             return dbAccount;
         }
 
@@ -49,6 +50,7 @@ namespace Infrastructure.Shared
             }
 
             if (Validate.IsNull(dbAccount)) throw new ServerException(Error.AccountNotFound);
+
             return dbAccount;
         }
 

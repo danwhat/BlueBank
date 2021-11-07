@@ -22,15 +22,16 @@ namespace Infrastructure.Repositories
         {
             int personType = GetPerson.Type(updatePerson);
             if (personType == 0) throw new ServerException(Error.PersonInvalidType);
+            
+            var dbPerson = GetPerson.ByDocs(doc, _context);
 
+            dbPerson.Name = updatePerson.Name;
+            dbPerson.Address = updatePerson.Address;
+            dbPerson.Doc = updatePerson.Doc;
+            dbPerson.UpdatedAt = DateTime.Now;
+            
             try
             {
-                var dbPerson = GetPerson.ByDocs(doc, _context);
-                dbPerson.Name = updatePerson.Name;
-                dbPerson.Address = updatePerson.Address;
-                dbPerson.Doc = updatePerson.Doc;
-                dbPerson.UpdatedAt = DateTime.Now;
-
                 _context.People.Update(dbPerson);
                 _context.SaveChanges();
 
@@ -47,18 +48,11 @@ namespace Infrastructure.Repositories
 
         public Domain.Entities.Person Get(string doc)
         {
-            try
-            {
-                var dbPerson = GetPerson.ByDocsIfActive(doc, _context);
-                return (dbPerson.Type == 1)
-                    ? BuildInstance.NaturalPerson(dbPerson)
-                    : BuildInstance.LegalPerson(dbPerson);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw new ServerException(Error.PersonGetFail);
-            }
+            var dbPerson = GetPerson.ByDocsIfActive(doc, _context);
+            
+            return (dbPerson.Type == 1)
+                ? BuildInstance.NaturalPerson(dbPerson)
+                : BuildInstance.LegalPerson(dbPerson);
         }
 
         public Domain.Entities.Person UpdateContactList(string doc, List<string> list)
@@ -76,8 +70,8 @@ namespace Infrastructure.Repositories
                         Person = dbPerson,
                         PhoneNumber = phoneNumber })
                     .ToList();
-
                 dbPerson.UpdatedAt = DateTime.Now;
+                
                 _context.People.Update(dbPerson);
                 _context.SaveChanges();
 
@@ -107,6 +101,7 @@ namespace Infrastructure.Repositories
 
                 _context.Contacts.Remove(contact);
                 _context.SaveChanges();
+
                 return (dbPerson.Type == 1)
                     ? BuildInstance.NaturalPerson(dbPerson)
                     : BuildInstance.LegalPerson(dbPerson);
@@ -127,6 +122,7 @@ namespace Infrastructure.Repositories
                 var contact = _context.Contacts
                     .Where(contact => contact.PersonId == dbPerson.Id && contact.PhoneNumber == phoneNumber)
                     .FirstOrDefault<Contact>();
+
                 if (contact != null) return (dbPerson.Type == 1)
                    ? BuildInstance.NaturalPerson(dbPerson)
                    : BuildInstance.LegalPerson(dbPerson);
@@ -134,6 +130,7 @@ namespace Infrastructure.Repositories
                 contact = new Contact { Person = dbPerson, PhoneNumber = phoneNumber };
                 _context.Contacts.Add(contact);
                 _context.SaveChanges();
+
                 return (dbPerson.Type == 1)
                         ? BuildInstance.NaturalPerson(dbPerson)
                         : BuildInstance.LegalPerson(dbPerson);

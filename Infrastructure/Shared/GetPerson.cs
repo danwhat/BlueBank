@@ -54,9 +54,9 @@ namespace Infrastructure.Shared
             try
             {
                 return context.People
-                .Where(curr => curr.Doc == docs)
-                .Include(person => person.Contacts)
-                .FirstOrDefault<Person>();
+                    .Where(curr => curr.Doc == docs)
+                    .Include(person => person.Contacts)
+                    .FirstOrDefault<Person>();
             }
             catch (Exception e)
             {
