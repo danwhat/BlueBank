@@ -11,8 +11,8 @@ namespace Domain.Requests
         {
             _accountNumber = AccountNumber;
             _dto = dto;
-            _accountRepository = new AccountRepository();
-            _transactionRepositoy = new TransactionRepository();
+            //_accountRepository = new AccountRepository();
+            //_transactionRepositoy = new TransactionRepository();
         }
 
         private readonly int _accountNumber;

@@ -10,9 +10,9 @@ namespace Domain.Requests
         public DepositRequest(int AccountNumber, TransactionDTO dto)
         {
             _accountNumber = AccountNumber;
-            _dto = dto;
-            _accountRepository = new AccountRepository();
-            _transactionRepositoy = new TransactionRepository();
+            _dto = dto;                        
+            //_accountRepository = new AccountRepository();
+            //_transactionRepositoy = new TransactionRepository();
         }
 
         private readonly int _accountNumber;

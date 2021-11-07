@@ -14,20 +14,21 @@ namespace Infrastructure
             //var now = DateTime.Now;
 
             // criação de user
-            //var person = new Domain.Entities.NaturalPerson
-            //{ Name = "Alexandre Leite", Cpf = "123", Address = "Rua da Vila Xp" };
+            var person = new Domain.Entities.LegalPerson
+            { Name = "Daniel Madson Inc", Cnpj = "456", Address = "Vizinho a casa do Dan" };
 
             //var person2 = new Domain.Entities.NaturalPerson
             //{ Name = "Alexandre Segundus", Cpf = "888", Address = "Rua de Trás da Vila Xp" };
-            //var newPerson = peopleRepository.Create(person2);
+            //var newPerson = peopleRepository.Create(person);
 
             // add contact
-            var personWithContact = peopleRepository.AddContact("123", "aloooooou767676");
+            //var personWithContact = peopleRepository.AddContact("456", "tomar uma");
 
             // pegar user
-            //var teste = peopleRepository.Get("123");
+            //var teste = peopleRepository.Get("456");
 
             //update user
+            //person.Cnpj ="123";
             //var result2 = peopleRepository.Update("123", person);
 
 
@@ -49,18 +50,19 @@ namespace Infrastructure
             //var teste = peopleRepository.Get("123");
 
             //criar conta
-            //var newAccount = new Domain.Entities.Account { Person = person };
-            //var resultAccount = accountRepository.Create(newAccount);
+            var newAccount = new Domain.Entities.Account { Person = person };
+            var resultAccount = accountRepository.Create(newAccount);
 
             // get account
             //var result = accountRepository.Get(2);
             //var result = accountRepository.Get(0);
-            var result = accountRepository.Get("123");
+            //var result = accountRepository.Get("123");
 
 
             //remove account
             //var account = new Domain.Entities.Account { AccountNumber = 1 };
             //var result = accountRepository.Delete(account);
+            //var resultAccount2 = accountRepository.Get(1);
 
             //Console.WriteLine($"Conta removida? {((result) ? "sim" : "não")}");
             //Console.WriteLine(updated.PhoneNumbers);
@@ -73,6 +75,7 @@ namespace Infrastructure
             //transaction.SetValue(250.00m);
 
             //transactionRepository.Create(transaction);
+            
         }
     }
 }

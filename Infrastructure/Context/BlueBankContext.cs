@@ -29,7 +29,7 @@ namespace Infrastructure
                 .HasDefaultValue(true);
             modelBuilder.Entity<Person>()
                 .Property(person => person.CreatedAt)
-                .HasDefaultValue(DateTime.Now);
+                .HasDefaultValueSql("getdate()");
             modelBuilder.Entity<Person>()
                 .Property(person => person.UpdatedAt)
                 .HasDefaultValue(null);
@@ -39,14 +39,14 @@ namespace Infrastructure
                 .HasDefaultValue(true);
             modelBuilder.Entity<Account>()
                 .Property(account => account.CreatedAt)
-                .HasDefaultValue(DateTime.Now);
+                .HasDefaultValueSql("getdate()");
             modelBuilder.Entity<Account>()
                 .Property(person => person.UpdatedAt)
                 .HasDefaultValue(null);
 
             modelBuilder.Entity<Contact>()
                 .Property(contact => contact.CreatedAt)
-                .HasDefaultValue(DateTime.Now);
+                .HasDefaultValueSql("getdate()");
             modelBuilder.Entity<Contact>()
                 .HasOne<Person>(contact => contact.Person)
                 .WithMany(person => person.Contacts)
@@ -54,7 +54,7 @@ namespace Infrastructure
 
             modelBuilder.Entity<Transaction>()
                .Property(transaction => transaction.CreatedAt)
-               .HasDefaultValue(DateTime.Now);
+               .HasDefaultValueSql("getdate()");
             modelBuilder.Entity<Transaction>()
                .HasOne<Account>(transaction => transaction.AccountFrom)
                .WithMany(account => account.TransactionsFrom);
@@ -64,7 +64,7 @@ namespace Infrastructure
 
             modelBuilder.Entity<TransactionLog>()
                .Property(transactionLog => transactionLog.CreatedAt)
-               .HasDefaultValue(DateTime.Now);
+               .HasDefaultValueSql("getdate()");
             modelBuilder.Entity<TransactionLog>()
                .HasOne<Account>(transactionLog => transactionLog.Account)
                .WithMany(account => account.TransactionLogs)

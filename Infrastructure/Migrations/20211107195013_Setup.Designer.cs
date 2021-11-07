@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BlueBankContext))]
-    [Migration("20211105194137_SetUp")]
-    partial class SetUp
+    [Migration("20211107195013_Setup")]
+    partial class Setup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,7 +31,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(1340));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(2474));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
@@ -89,7 +89,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 978, DateTimeKind.Local).AddTicks(5991));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<string>("Doc")
                         .HasColumnType("nvarchar(450)");
@@ -134,7 +134,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 985, DateTimeKind.Local).AddTicks(3338));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
@@ -164,7 +164,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 997, DateTimeKind.Local).AddTicks(4188));
+                        .HasDefaultValueSql("getdate()");
 
                     b.Property<int>("TransactionId")
                         .HasColumnType("int");

@@ -149,7 +149,7 @@ namespace Infrastructure.Repositories
             int personType = GetPerson.Type(person);
             if (personType == 0) return null;
 
-            var dbPerson = GetPerson.ByDocs(person.Doc, _context);
+            var dbPerson = GetPerson.ByDocsOrDefault(person.Doc, _context);
             if (dbPerson != null) return null;
 
             try
