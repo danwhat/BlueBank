@@ -29,7 +29,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(6956));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(1340));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -40,38 +40,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(7432));
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("Infrastructure.Balance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Balances");
                 });
 
             modelBuilder.Entity("Infrastructure.Contact", b =>
@@ -84,7 +59,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(9397));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 982, DateTimeKind.Local).AddTicks(2474));
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
@@ -112,7 +87,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 745, DateTimeKind.Local).AddTicks(1052));
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 978, DateTimeKind.Local).AddTicks(5991));
 
                     b.Property<string>("Doc")
                         .HasColumnType("nvarchar(450)");
@@ -130,9 +105,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 11, 3, 17, 6, 6, 749, DateTimeKind.Local).AddTicks(4042));
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -157,7 +130,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 985, DateTimeKind.Local).AddTicks(3338));
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
@@ -171,6 +146,39 @@ namespace Infrastructure.Migrations
                     b.ToTable("Transactions");
                 });
 
+            modelBuilder.Entity("Infrastructure.TransactionLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("BalanceAfter")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 11, 5, 16, 41, 36, 997, DateTimeKind.Local).AddTicks(4188));
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("TransactionLog");
+                });
+
             modelBuilder.Entity("Infrastructure.Account", b =>
                 {
                     b.HasOne("Infrastructure.Person", "Person")
@@ -180,17 +188,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("Infrastructure.Balance", b =>
-                {
-                    b.HasOne("Infrastructure.Account", "Account")
-                        .WithMany("Balances")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Infrastructure.Contact", b =>
@@ -207,11 +204,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Transaction", b =>
                 {
                     b.HasOne("Infrastructure.Account", "AccountFrom")
-                        .WithMany()
+                        .WithMany("TransactionsFrom")
                         .HasForeignKey("AccountFromId");
 
                     b.HasOne("Infrastructure.Account", "AccountTo")
-                        .WithMany()
+                        .WithMany("TransactionsTo")
                         .HasForeignKey("AccountToId");
 
                     b.Navigation("AccountFrom");
@@ -219,9 +216,32 @@ namespace Infrastructure.Migrations
                     b.Navigation("AccountTo");
                 });
 
+            modelBuilder.Entity("Infrastructure.TransactionLog", b =>
+                {
+                    b.HasOne("Infrastructure.Account", "Account")
+                        .WithMany("TransactionLogs")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Transaction", "Transaction")
+                        .WithMany()
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("Infrastructure.Account", b =>
                 {
-                    b.Navigation("Balances");
+                    b.Navigation("TransactionLogs");
+
+                    b.Navigation("TransactionsFrom");
+
+                    b.Navigation("TransactionsTo");
                 });
 
             modelBuilder.Entity("Infrastructure.Person", b =>

@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using Domain.Core.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Infrastructure.Shared
 {
@@ -6,33 +10,66 @@ namespace Infrastructure.Shared
     {
         internal static Person ByDocs(string docs, BlueBankContext context)
         {
-            var person = context.People
-                .Where(curr => curr.Doc == docs)
-                .FirstOrDefault<Person>();
+            Person dbPerson = null;
+            try
+            {
+                dbPerson = context.People
+                    .Where(curr => curr.Doc == docs)
+                    .Include(person => person.Contacts)
+                    .FirstOrDefault<Person>();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonGetFail);
+            }
 
-            var contactList = context.Contacts
-                .Where(contact => contact.PersonId == person.Id)
-                .ToList();
-
-            person.Contacts = contactList;
-
-            return person;
+            if (Validate.IsNull(dbPerson)) throw new ServerException(Error.PersonNotFound);
+            return dbPerson;
         }
 
-        internal static Person IfActive(string docs, BlueBankContext context)
+        internal static Person ByDocsIfActive(string docs, BlueBankContext context)
         {
-            var person = context.People
-                .Where(curr => curr.Doc == docs && curr.IsActive == true)
-                .FirstOrDefault<Person>();
+            Person dbPerson = null;
+            try
+            {
+                dbPerson = context.People
+                    .Where(curr => curr.Doc == docs && curr.IsActive == true)
+                    .Include(person => person.Contacts)
+                    .FirstOrDefault<Person>();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new ServerException(Error.PersonGetFail);
+            }
+            
+            if (Validate.IsNull(dbPerson)) throw new ServerException(Error.PersonNotFound);
+            return dbPerson;
 
-            var contactList = context.Contacts
-                .Where(contact => contact.PersonId == person.Id)
-                .ToList();
+        }
 
-            person.Contacts = contactList;
+        internal static Person ByDocsOrDefault(string docs, BlueBankContext context)
+        {
+            try
+            {
+                return context.People
+                    .Where(curr => curr.Doc == docs)
+                    .Include(person => person.Contacts)
+                    .FirstOrDefault<Person>();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return new Person();
+            }
+        }
 
-            return person;
-
+        internal static int Type(Domain.Entities.Person person)
+        {
+            if (person.GetType() == typeof(Domain.Entities.NaturalPerson)) return 1;
+            if (person.GetType() == typeof(Domain.Entities.LegalPerson)) return 2;
+            return 0;
         }
     }
 }

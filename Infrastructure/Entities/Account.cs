@@ -8,9 +8,11 @@ namespace Infrastructure
     {
         public int PersonId { get; set; }
         public Person Person { get; set; }
-        public List<Balance> Balances { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime CreatedAt { get; internal set; }
+        public List<TransactionLog> TransactionLogs { get; set; }
+        public List<Transaction> TransactionsFrom { get; set; }
+        public List<Transaction> TransactionsTo { get; set; }
+        public bool IsActive { get; set; }        
         public DateTime UpdatedAt { get; internal set; }
+
     }
 }
