@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Domain.Core.Interfaces;
+using Infrastructure;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace BlueBank.WebAPI
@@ -28,9 +25,20 @@ namespace BlueBank.WebAPI
         {
 
             services.AddControllers();
+
+            var connection = Configuration.GetConnectionString("BlueBankDB");
+            services.AddDbContext<BlueBankContext>
+            (
+                context => context.UseSqlServer(connection),
+                ServiceLifetime.Scoped
+            );
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlueBank.WebAPI", Version = "v1" });
+                c.SwaggerDoc("v0", new OpenApiInfo { Title = "BlueBank.WebAPI", Version = "v0" });
             });
         }
 
@@ -40,8 +48,9 @@ namespace BlueBank.WebAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlueBank.WebAPI v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v0/swagger.json", "BlueBank.WebAPI v0"));
             }
 
             app.UseHttpsRedirection();

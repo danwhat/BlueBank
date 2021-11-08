@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Core.DTOs;
+using Domain.Core.Interfaces;
 using Domain.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,12 +10,19 @@ namespace BlueBank.WebAPI.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
+        private readonly IAccountRepository _accountRepository;
+
+        public AccountController(IAccountRepository accountRepository)
+        {
+            _accountRepository = accountRepository;
+        }
+
         [HttpPost]
         public ObjectResult CreateAccount([FromBody] AccountDto dto)
         {
             try
             {
-                var request = new CreateAccountRequest(dto);
+                var request = new CreateAccountRequest(dto, _accountRepository);
                 var result = request.Create();
                 return Ok(result);
             }
@@ -43,7 +51,7 @@ namespace BlueBank.WebAPI.Controllers
         [HttpGet("{accountNumber}")]
         public ObjectResult GetAccount(int accountNumber)
         {
-            var request = new GetAccountRequest(accountNumber);
+            var request = new GetAccountRequest(accountNumber, _accountRepository);
 
             try
             {
@@ -59,7 +67,7 @@ namespace BlueBank.WebAPI.Controllers
         [HttpDelete("{accountNumber}")]
         public ObjectResult DeleteAccount(int accountNumber)
         {
-            var request = new DeleteAccountRequest(accountNumber);
+            var request = new DeleteAccountRequest(accountNumber, _accountRepository);
 
             try
             {

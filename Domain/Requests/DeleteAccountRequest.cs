@@ -1,25 +1,18 @@
-﻿using Domain.Core.DTOs;
-using Domain.Core.Exceptions;
+﻿using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
-using Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Requests
 {
     public class DeleteAccountRequest
     {
         private readonly int _accountNumber;
-        private readonly AccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
 
-        public DeleteAccountRequest(int accountNumber)
+        public DeleteAccountRequest(int accountNumber, IAccountRepository accountRepository)
         {
             _accountNumber = accountNumber;
-            _accountRepository = new AccountRepository();
+            _accountRepository = accountRepository;
         }
         
 
@@ -32,7 +25,6 @@ namespace Domain.Requests
         {
             Validation();
             Account acc = _accountRepository.Get(_accountNumber);
-            var account = new Infrastructure.Account();
             bool result = _accountRepository.Delete(acc);
             return result;
         }

@@ -1,12 +1,8 @@
-﻿using Domain.Core.Exceptions;
-using Domain.Entities;
-using Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Domain.Core.Exceptions;
+using Domain.Core.Interfaces;
+using Domain.Entities;
 
 namespace Domain.Services.Validations
 {
@@ -40,7 +36,7 @@ namespace Domain.Services.Validations
 
         }
 
-        public static void ThisAccountExistsValidation(AccountRepository accountRepository, int accountNumber)
+        public static void ThisAccountExistsValidation(IAccountRepository accountRepository, int accountNumber)
         {
             try
             {
@@ -53,7 +49,7 @@ namespace Domain.Services.Validations
             }
         }
 
-        public static void ThisPersonExistsValidation(AccountRepository accountRepository, int accountNumber, out Person person)
+        public static void ThisPersonExistsValidation(IAccountRepository accountRepository, int accountNumber, out Person person)
         {
             try
             {
@@ -65,7 +61,7 @@ namespace Domain.Services.Validations
             }
         }
 
-        public static void ThisPersonExistsValidation(PersonRepository personRepository, string doc, out Person person)
+        public static void ThisPersonExistsValidation(IPersonRepository personRepository, string doc, out Person person)
         {
             try
             {
@@ -87,7 +83,7 @@ namespace Domain.Services.Validations
             if (person.PhoneNumbers.Contains(phoneNumber)) throw new InvalidInputException("Número já Cadastrado.");
         }
 
-        public static void SufficientBalanceValidation(AccountRepository accountRepository, int accountNumber, Decimal value)
+        public static void SufficientBalanceValidation(IAccountRepository accountRepository, int accountNumber, Decimal value)
         {
             Account acc = accountRepository.Get(accountNumber);
             if (acc.Balance < value) throw new InvalidInputException("Saldo insuficiente.");

@@ -1,24 +1,20 @@
-﻿using System;
-using Domain.Core.DTOs;
+﻿using Domain.Core.DTOs;
+using Domain.Core.Interfaces;
 using Domain.Entities;
-using Domain.Core.Exceptions;
-using Infrastructure.Repositories;
-using System;
-using System.Text.RegularExpressions;
 using Domain.Services.Validations;
 
 namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        public CreateAccountRequest(AccountDto dto)
+        public CreateAccountRequest(AccountDto dto, IAccountRepository accountRepository)
         {
             _dto = dto;
-            _accountRepository = new AccountRepository();
+            _accountRepository = accountRepository;
         }
 
         private readonly AccountDto _dto;
-        private readonly AccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
 
 
 
@@ -29,7 +25,7 @@ namespace Domain.Requests
             Validations.PhoneNumberValidation(_dto.PhoneNumber);
         }
 
-        public bool isNaturalPerson()
+        public bool IsNaturalPerson()
         {
             return _dto.Doc.Length == 11;
         }
@@ -40,7 +36,7 @@ namespace Domain.Requests
 
             var account = new Account();
             
-            if (isNaturalPerson())
+            if (IsNaturalPerson())
             {
                 NaturalPerson person = new ();
                 person.Name = _dto.Name;

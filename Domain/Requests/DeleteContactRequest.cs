@@ -1,13 +1,7 @@
-﻿using Domain.Core.DTOs;
-using Domain.Core.Exceptions;
+﻿using System;
+using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
-using Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Requests
 {
@@ -15,27 +9,27 @@ namespace Domain.Requests
     {
         private readonly string _phoneNumber;
         private readonly string _doc;
-        private readonly PersonRepository _personRepository;
+        private readonly IPersonRepository _personRepository;
 
-        public DeleteContactRequest(string doc, string phoneNumber)
+        public DeleteContactRequest(string doc, string phoneNumber, IPersonRepository personRepository)
         {
             _phoneNumber = phoneNumber;
             _doc = doc;
-            _personRepository = new PersonRepository();
+            _personRepository = personRepository;
         }
 
 
 
-        public void valid()
+        public void Valid()
         {
-            Person person = (Person)Activator.CreateInstance(typeof(Person));
-            Validations.ThisPersonExistsValidation(_personRepository, _doc, out person);
+            //Person person = (Person)Activator.CreateInstance(typeof(Person));
+            Validations.ThisPersonExistsValidation(_personRepository, _doc, out Person person);
             Validations.ThisPersonHasThatPhoneNumberValidation(_phoneNumber, person);
         }
 
         public Person Delete()
         {
-            valid();
+            Valid();
             Person result = _personRepository.RemoveContact(_doc, _phoneNumber);
             return result;
         }

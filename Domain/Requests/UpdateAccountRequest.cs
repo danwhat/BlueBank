@@ -1,9 +1,4 @@
-﻿using Domain.Core.DTOs;
-using Domain.Entities;
-using Infrastructure.Repositories;
-using System;
-
-namespace Domain.Requests
+﻿namespace Domain.Requests
 {
     public class UpdateAccountRequest
     {

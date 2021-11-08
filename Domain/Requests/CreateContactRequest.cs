@@ -1,25 +1,28 @@
 ﻿using Domain.Core.DTOs;
+using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
-using Infrastructure.Repositories;
-using System;
 
 namespace Domain.Requests
 {
     public class CreateContactRequest
     {
-        public CreateContactRequest(int accountNumber, PersonRequestDto phone)
+        public CreateContactRequest(
+            int accountNumber,
+            PersonRequestDto phone,
+            IPersonRepository personRepository,
+            IAccountRepository accountRepository)
         {
             _accountNumber = accountNumber;
             _phone = phone;
-            _accountRepository = new AccountRepository();
-            _personRepository = new PersonRepository();
+            _accountRepository = accountRepository;
+            _personRepository = personRepository;
         }
 
         private readonly int _accountNumber;
         private readonly PersonRequestDto _phone;
-        private readonly AccountRepository _accountRepository;
-        private readonly PersonRepository _personRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IPersonRepository _personRepository;
 
         public void Validation()
         {
