@@ -1,5 +1,6 @@
 ﻿using Domain.Core.DTOs;
 using Domain.Entities;
+using Domain.Services.Validations;
 using Infrastructure.Repositories;
 using System;
 
@@ -20,18 +21,14 @@ namespace Domain.Requests
         private readonly AccountRepository _accountRepository;
         private readonly TransactionRepository _transactionRepositoy;
 
-        public bool Validate()
+        public void Validation()
         {
-            Account acc = _accountRepository.Get(_accountNumber);
-            // valida se a conta existe
-            if (acc == null) return false;
-            // validado
-            return true;
+            Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
         }
         
         public TransactionResponseDTO Deposit()
         {
-            if (!Validate()) throw new Exception("Não passou na validação");
+            Validation();
 
             Account acc = _accountRepository.Get(_accountNumber);
 
@@ -51,7 +48,7 @@ namespace Domain.Requests
             }
             catch(Exception e)
             {
-                throw new Exception("Deu erro aqui.");
+                throw new Exception("Deu erro aqui." + e.Message);
             }
         }
     }

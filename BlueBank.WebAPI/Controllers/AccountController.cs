@@ -25,13 +25,29 @@ namespace BlueBank.WebAPI.Controllers
 
         }
 
-        [HttpPut]
-        public ObjectResult UpdateAccount([FromBody] AccountDto dto)
+        //[HttpPut]
+        //public ObjectResult UpdateAccount([FromBody] AccountDto dto)
+        //{
+        //    try
+        //    {
+        //        var request = new UpdateAccountRequest(dto);
+        //        var result = request.Update();
+        //        return Ok(result);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest("Mensagem de erro:" + e.Message);
+        //    }
+        //}
+
+        [HttpGet("{accountNumber}")]
+        public ObjectResult GetAccount(int accountNumber)
         {
+            var request = new GetAccountRequest(accountNumber);
+
             try
             {
-                var request = new UpdateAccountRequest(dto);
-                var result = request.Update();
+                var result = request.Get();
                 return Ok(result);
             }
             catch (Exception e)
@@ -40,20 +56,20 @@ namespace BlueBank.WebAPI.Controllers
             }
         }
 
-        //[HttpDelete("{accountNumber}")]
-        //public ObjectResult DeleteAccount(int accountNumber)
-        //{
-        //    var request = new DeleteAccountRequest(accountNumber);
+        [HttpDelete("{accountNumber}")]
+        public ObjectResult DeleteAccount(int accountNumber)
+        {
+            var request = new DeleteAccountRequest(accountNumber);
 
-        //    try
-        //    {
-        //        var result = request.Delete();
-        //        return Ok(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest("Mensagem de erro:" + e.Message);
-        //    }
-        //}
+            try
+            {
+                var result = request.Delete();
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Mensagem de erro:" + e.Message);
+            }
+        }
     }    
 }

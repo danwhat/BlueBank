@@ -1,8 +1,11 @@
 ﻿using System;
 using Domain.Core.DTOs;
 using Domain.Entities;
-using Infrastructure;
+using Domain.Core.Exceptions;
 using Infrastructure.Repositories;
+using System;
+using System.Text.RegularExpressions;
+using Domain.Services.Validations;
 
 namespace Domain.Requests
 {
@@ -11,22 +14,29 @@ namespace Domain.Requests
         public CreateAccountRequest(AccountDto dto)
         {
             _dto = dto;
-            //_accountRepository = new AccountRepository(context);
+            _accountRepository = new AccountRepository();
         }
 
         private readonly AccountDto _dto;
         private readonly AccountRepository _accountRepository;
 
-        public bool Validate()
+
+
+        public void Validation()
         {
-            // validadoes de docs
-            // validadoes de name
-            return true;
+            Validations.NameValidation(_dto.Name);
+            Validations.DocumentationValidation(_dto.Doc);
+            Validations.PhoneNumberValidation(_dto.PhoneNumber);
+        }
+
+        public bool isNaturalPerson()
+        {
+            return _dto.Doc.Length == 11;
         }
         
         public AccountDto Create()
         {
-            if (!Validate()) throw new Exception("Faltaou tal coisa aqui");
+            Validation();
 
             var account = new Account();
             
@@ -56,9 +66,5 @@ namespace Domain.Requests
             return response;
         }
 
-        public bool isNaturalPerson()
-        {
-            return _dto.Doc.Length == 11;
-        }
     }
 }
