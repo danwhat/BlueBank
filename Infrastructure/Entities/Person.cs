@@ -13,7 +13,7 @@ namespace Infrastructure
         public ICollection<Account> Account { get; set; }
         public ICollection<Contact> Contacts { get; set; }        
         public DateTime UpdatedAt { get; internal set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
 
     }
 }

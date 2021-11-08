@@ -79,94 +79,6 @@ namespace Infrastructure.Repositories
         }
         #endregion        
 
-        #region Extra methods
-        private Domain.Entities.Account GetByPersonDoc(string docs)
-        {
-            // validacoes
-            Account account = null;
-            try
-            {
-                account = GetAccount.IfActiveByOwnerDoc(docs, _context);
-                if (account == null) return null;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-
-            var currentBalance = GetBalance.Current(account.TransactionLogs);
-
-            var accountEntity = new Domain.Entities.Account
-            {
-                AccountNumber = account.Id,
-                Balance = currentBalance
-            };
-
-            if (account.Person.Type == 1)
-            {
-                accountEntity.Person = BuildInstance.NaturalPerson(account.Person);
-                return accountEntity;
-            }
-            else
-            {
-                accountEntity.Person = BuildInstance.LegalPerson(account.Person);
-                return accountEntity;
-            }
-
-        }
-
-        private void Remove(Domain.Entities.Account account)
-        {
-            Account dbAccount = null;
-            try
-            {
-                dbAccount = GetAccount.IfActiveByOwnerDoc(account.Person.Doc, _context);
-                if (dbAccount == null) return;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return;
-            }
-
-            dbAccount.IsActive = false;
-
-            try
-            {
-                _context.Accounts.Update(dbAccount);
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        private void Remove(string docs)
-        {
-            var dbPerson = GetPerson.ByDocsIfActive(docs, _context);
-            if (dbPerson == null) throw new Exception();
-
-            var dbAccount = _context.Accounts
-                .Where(curr => curr.PersonId == dbPerson.Id && curr.IsActive == true)
-                .FirstOrDefault<Account>();
-            if (dbAccount == null) throw new Exception();
-
-            dbAccount.IsActive = false;
-
-            try
-            {
-                _context.Accounts.Update(dbAccount);
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-        #endregion        
-        
         private Person GetOrCreatePerson(Domain.Entities.Account account)
         {
             int personType = GetPerson.Type(account.Person);
@@ -182,6 +94,11 @@ namespace Infrastructure.Repositories
                     Address = account.Person.Address,
                     Type = personType,
                 };
+
+                dbPerson.Contacts = account.Person.PhoneNumbers
+                    .Select(number => new Contact { Person = dbPerson, PhoneNumber = number })
+                    .ToList();
+                    
             }
 
             ActivatePerson(dbPerson);
@@ -189,7 +106,7 @@ namespace Infrastructure.Repositories
             return dbPerson;
         }
 
-        private void ActivatePerson(Person dbPerson)
+        private static void ActivatePerson(Person dbPerson)
         {
             if (dbPerson.IsActive == false)
             {

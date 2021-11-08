@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Migrations
 {
-    public partial class Setup : Migration
+    public partial class SetUp : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,7 +18,7 @@ namespace Infrastructure.Migrations
                     Type = table.Column<int>(type: "int", nullable: false),
                     Doc = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()")
                 },
                 constraints: table =>
@@ -33,7 +33,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PersonId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValue: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()")
                 },
@@ -77,7 +77,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountFromId = table.Column<int>(type: "int", nullable: true),
                     AccountToId = table.Column<int>(type: "int", nullable: true),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Value = table.Column<decimal>(type: "money", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()")
                 },
                 constraints: table =>
@@ -103,8 +103,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BalanceAfter = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Value = table.Column<decimal>(type: "money", nullable: false),
+                    BalanceAfter = table.Column<decimal>(type: "money", nullable: false),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     TransactionId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()")

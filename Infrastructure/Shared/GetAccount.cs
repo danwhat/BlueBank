@@ -18,6 +18,7 @@ namespace Infrastructure.Shared
                     .Include(account => account.Person)
                         .ThenInclude(person => person.Contacts)
                     .Include(account => account.TransactionLogs)
+                    .AsSingleQuery()
                     .FirstOrDefault<Account>();
             }
             catch (Exception e)
@@ -72,6 +73,7 @@ namespace Infrastructure.Shared
                     .Include(account => account.Person)
                         .ThenInclude(person => person.Contacts)
                     .Include(account => account.TransactionLogs)
+                    .AsSingleQuery()
                     .FirstOrDefault<Account>();
             }
             catch (Exception e)

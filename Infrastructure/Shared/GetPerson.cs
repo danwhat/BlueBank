@@ -16,6 +16,7 @@ namespace Infrastructure.Shared
                 dbPerson = context.People
                     .Where(curr => curr.Doc == docs)
                     .Include(person => person.Contacts)
+                    .AsSingleQuery()
                     .FirstOrDefault<Person>();
             }
             catch (Exception e)
@@ -36,6 +37,7 @@ namespace Infrastructure.Shared
                 dbPerson = context.People
                     .Where(curr => curr.Doc == docs && curr.IsActive == true)
                     .Include(person => person.Contacts)
+                    .AsSingleQuery()
                     .FirstOrDefault<Person>();
             }
             catch (Exception e)
@@ -56,6 +58,7 @@ namespace Infrastructure.Shared
                 return context.People
                     .Where(curr => curr.Doc == docs)
                     .Include(person => person.Contacts)
+                    .AsSingleQuery()
                     .FirstOrDefault<Person>();
             }
             catch (Exception e)

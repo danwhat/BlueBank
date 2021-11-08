@@ -11,7 +11,7 @@ namespace Infrastructure
         public List<TransactionLog> TransactionLogs { get; set; }
         public List<Transaction> TransactionsFrom { get; set; }
         public List<Transaction> TransactionsTo { get; set; }
-        public bool IsActive { get; set; }        
+        public bool? IsActive { get; set; }        
         public DateTime UpdatedAt { get; internal set; }
 
     }

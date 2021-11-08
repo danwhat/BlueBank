@@ -5,16 +5,21 @@ namespace Infrastructure
 {
     public class BlueBankContext : DbContext
     {
+        public BlueBankContext(DbContextOptions options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+
         internal DbSet<Person> People { get; set; }
         internal DbSet<Contact> Contacts { get; set; }
         internal DbSet<Account> Accounts { get; set; }
         internal DbSet<TransactionLog> TransactionLog { get; set; }
         internal DbSet<Transaction> Transactions { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BlueBankDB;Trusted_Connection=true;");
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BlueBankDB;Trusted_Connection=true;");
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +57,10 @@ namespace Infrastructure
                 .WithMany(person => person.Contacts)
                 .HasForeignKey(contact => contact.PersonId);
 
+
+            modelBuilder.Entity<Transaction>()
+                .Property(transaction => transaction.Value)
+                .HasColumnType("money");
             modelBuilder.Entity<Transaction>()
                .Property(transaction => transaction.CreatedAt)
                .HasDefaultValueSql("getdate()");
@@ -62,6 +71,12 @@ namespace Infrastructure
                .HasOne<Account>(transaction => transaction.AccountTo)
                .WithMany(account => account.TransactionsTo);
 
+            modelBuilder.Entity<TransactionLog>()
+                .Property(log => log.Value)
+                .HasColumnType("money");
+            modelBuilder.Entity<TransactionLog>()
+                .Property(log => log.BalanceAfter)
+                .HasColumnType("money");
             modelBuilder.Entity<TransactionLog>()
                .Property(transactionLog => transactionLog.CreatedAt)
                .HasDefaultValueSql("getdate()");
