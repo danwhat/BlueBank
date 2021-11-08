@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Infrastructure.Context.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
@@ -23,68 +23,15 @@ namespace Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Person>()
-                .Property(person => person.Name)
-                .IsRequired();
-            modelBuilder.Entity<Person>()
-                .HasIndex(person => new { person.Doc })
-                .IsUnique();
-            modelBuilder.Entity<Person>()
-                .Property(person => person.IsActive)
-                .HasDefaultValue(true);
-            modelBuilder.Entity<Person>()
-                .Property(person => person.CreatedAt)
-                .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<Person>()
-                .Property(person => person.UpdatedAt)
-                .HasDefaultValue(null);
+            new PersonConfiguration().Configure(modelBuilder.Entity<Person>());
 
-            modelBuilder.Entity<Account>()
-                .Property(account => account.IsActive)
-                .HasDefaultValue(true);
-            modelBuilder.Entity<Account>()
-                .Property(account => account.CreatedAt)
-                .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<Account>()
-                .Property(person => person.UpdatedAt)
-                .HasDefaultValue(null);
+            new AccountConfiguration().Configure(modelBuilder.Entity<Account>());
 
-            modelBuilder.Entity<Contact>()
-                .Property(contact => contact.CreatedAt)
-                .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<Contact>()
-                .HasOne<Person>(contact => contact.Person)
-                .WithMany(person => person.Contacts)
-                .HasForeignKey(contact => contact.PersonId);
+            new ContactConfiguration().Configure(modelBuilder.Entity<Contact>());
 
+            new TransactionConfiguration().Configure(modelBuilder.Entity<Transaction>());
 
-            modelBuilder.Entity<Transaction>()
-                .Property(transaction => transaction.Value)
-                .HasColumnType("money");
-            modelBuilder.Entity<Transaction>()
-               .Property(transaction => transaction.CreatedAt)
-               .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<Transaction>()
-               .HasOne<Account>(transaction => transaction.AccountFrom)
-               .WithMany(account => account.TransactionsFrom);
-            modelBuilder.Entity<Transaction>()
-               .HasOne<Account>(transaction => transaction.AccountTo)
-               .WithMany(account => account.TransactionsTo);
-
-            modelBuilder.Entity<TransactionLog>()
-                .Property(log => log.Value)
-                .HasColumnType("money");
-            modelBuilder.Entity<TransactionLog>()
-                .Property(log => log.BalanceAfter)
-                .HasColumnType("money");
-            modelBuilder.Entity<TransactionLog>()
-               .Property(transactionLog => transactionLog.CreatedAt)
-               .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<TransactionLog>()
-               .HasOne<Account>(transactionLog => transactionLog.Account)
-               .WithMany(account => account.TransactionLogs)
-               .HasForeignKey(transactionLog => transactionLog.AccountId);
-
+            new TransactionLogConfiguration().Configure(modelBuilder.Entity<TransactionLog>());
         }
     }
 }
