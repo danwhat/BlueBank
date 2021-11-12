@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Core.DTOs
 {
-    public class TransactionResponseDTO
+    public class TransactionResponseDto
     {
         public string Message { get; set; }
         public Decimal OldBalance { get; set; }

@@ -1,4 +1,6 @@
-﻿using Domain.Core.Exceptions;
+﻿using System;
+using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 
@@ -15,16 +17,21 @@ namespace Domain.Requests
             _accountRepository = accountRepository;
         }
 
-        public Account Get()
+        public AccountDto Get()
         {
             try
             {
                 Account result = _accountRepository.Get(_accountNumber);
-                return result;
+                AccountDto response = new(result);
+                return response;
             }
-            catch (ServerException)
+            catch (ServerException e)
             {
-                throw new InvalidInputException("Conta não encontrada.");
+                throw new Exception("Ocorreu um erro: " + e.Message);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ocorreu um erro interno.");
             }
         }
     }

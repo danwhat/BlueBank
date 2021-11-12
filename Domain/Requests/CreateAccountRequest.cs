@@ -1,4 +1,6 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
@@ -7,16 +9,15 @@ namespace Domain.Requests
 {
     public class CreateAccountRequest
     {
-        public CreateAccountRequest(AccountDto dto, IAccountRepository accountRepository)
+        private readonly CreateAccountDto _dto;
+
+        private readonly IAccountRepository _accountRepository;
+
+        public CreateAccountRequest(CreateAccountDto dto, IAccountRepository accountRepository)
         {
             _dto = dto;
             _accountRepository = accountRepository;
         }
-
-        private readonly AccountDto _dto;
-        private readonly IAccountRepository _accountRepository;
-
-
 
         public void Validation()
         {
@@ -29,16 +30,16 @@ namespace Domain.Requests
         {
             return _dto.Doc.Length == 11;
         }
-        
+
         public AccountDto Create()
         {
             Validation();
 
             var account = new Account();
-            
+
             if (IsNaturalPerson())
             {
-                NaturalPerson person = new ();
+                NaturalPerson person = new();
                 person.Name = _dto.Name;
                 person.Address = _dto.Address;
                 person.Cpf = _dto.Doc;
@@ -48,7 +49,7 @@ namespace Domain.Requests
             }
             else
             {
-                LegalPerson person = new ();
+                LegalPerson person = new();
                 person.Name = _dto.Name;
                 person.Address = _dto.Address;
                 person.Cnpj = _dto.Doc;
@@ -57,10 +58,20 @@ namespace Domain.Requests
                 account.Person = person;
             }
 
-            Account newAccount = _accountRepository.Create(account);
-            AccountDto response = new(newAccount);
-            return response;
+            try
+            {
+                Account newAccount = _accountRepository.Create(account);
+                AccountDto response = new(newAccount);
+                return response;
+            }
+            catch (ServerException e)
+            {
+                throw new Exception("Ocorreu um erro: " + e.Message);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ocorreu um erro interno.");
+            }
         }
-
     }
 }

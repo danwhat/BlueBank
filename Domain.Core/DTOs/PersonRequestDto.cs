@@ -1,6 +1,4 @@
-﻿using Domain.Entities;
-
-namespace Domain.Core.DTOs
+﻿namespace Domain.Core.DTOs
 {
     public class PersonRequestDto
     {

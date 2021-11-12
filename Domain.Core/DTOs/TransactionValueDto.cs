@@ -2,9 +2,8 @@
 
 namespace Domain.Core.DTOs
 {
-    public class TransactionDto
+    public class TransactionValueDto
     {
         public Decimal Value { get; set; }
-        public int AccountNumberTo { get; set; }
     }
 }

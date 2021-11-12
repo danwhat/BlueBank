@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Infrastructure.Shared
+﻿namespace Infrastructure.Shared
 {
-    static class Error
+    internal static class Error
     {
         internal static string InsufficientFunds = "Saldo insuficiente.";
         internal static string AccountNotFound = "Conta não encontrada.";
@@ -23,5 +17,6 @@ namespace Infrastructure.Shared
         internal static string PersonUpdateFail = "Falha ao tentar atualizar dados de cliente. Dados não alterados.";
         internal static string InitialDateInvalid = "Data inicial maior que data final.";
         internal static string DateInvalid = "Uma das datas é inválida.";
+        internal static string ContactNotFound = "Contato não encontrado.";
     }
 }

@@ -1,32 +1,28 @@
-﻿using Domain.Core.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Domain.Core.Exceptions;
 
 namespace Infrastructure.Shared
 {
-    static class Validate
+    internal static class Validate
     {
-        static internal bool IsNull(Object obj)
+        internal static bool IsNull(Object obj)
         {
             return obj == null;
         }
 
-        static internal bool Account(Domain.Entities.Account account)
+        internal static bool Account(Domain.Entities.Account account)
         {
-            var nullAccount = account?.AccountNumber < 1;
-            return nullAccount;
+            var validAccount = account?.AccountNumber > 0;
+            return validAccount;
         }
 
-        static internal void TransactionDate(DateTime initial, DateTime final)
+        internal static void TransactionDate(DateTime initial, DateTime final)
         {
             DateTime now = DateTime.Now;
 
             if (initial > final) throw new ServerException(Error.InitialDateInvalid);
             if (initial.Year == 0001 || final.Year == 0001) throw new ServerException(Error.DateInvalid);
-            if (initial > now || final > now) throw new ServerException(Error.DateInvalid);            
+            if (initial > now || final > now) throw new ServerException(Error.DateInvalid);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
@@ -8,31 +9,34 @@ namespace Domain.Requests
 {
     public class TransferRequest
     {
+        private readonly int _accountNumber;
+
+        private readonly TransactionDto _dto;
+
+        private readonly IAccountRepository _accountRepository;
+
+        private readonly ITransactionRepository _transactionRepository;
+
         public TransferRequest(
-            int AccountNumber, 
-            TransactionDTO dto, 
+            int AccountNumber,
+            TransactionDto dto,
             IAccountRepository accountRepository,
             ITransactionRepository transactionRepository)
         {
             _accountNumber = AccountNumber;
             _dto = dto;
             _accountRepository = accountRepository;
-            _transactionRepositoy = transactionRepository;
+            _transactionRepository = transactionRepository;
         }
 
-        private readonly int _accountNumber;
-        private readonly TransactionDTO _dto;
-        private readonly IAccountRepository _accountRepository;
-        private readonly ITransactionRepository _transactionRepositoy;
-
         public void Validation()
-        {         
+        {
             Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
             Validations.ThisAccountExistsValidation(_accountRepository, _dto.AccountNumberTo);
             Validations.SufficientBalanceValidation(_accountRepository, _accountNumber, _dto.Value);
         }
-        
-        public TransactionResponseDTO Transfer()
+
+        public TransactionResponseDto Transfer()
         {
             Validation();
 
@@ -46,19 +50,23 @@ namespace Domain.Requests
 
             try
             {
-                Transaction transactionDB = _transactionRepositoy.Create(transaction);
+                Transaction transactionDB = _transactionRepository.Create(transaction);
                 Account accAtualizada = _accountRepository.Get(_accountNumber);
-                var transactionResponse = new TransactionResponseDTO
+                var transactionResponse = new TransactionResponseDto
                 {
-                    Message = $"Transferencia para {accTo.Person.Name} realizado com sucesso.",
+                    Message = $"Transferência para {accTo.Person.Name} realizada com sucesso.",
                     OldBalance = accFrom.Balance,
                     CurrentBalance = accAtualizada.Balance
                 };
                 return transactionResponse;
             }
-            catch(Exception e)
+            catch (ServerException e)
             {
-                throw new Exception($"Falha de comunicação com o Repository: {e.Message}");
+                throw new Exception("Ocorreu um erro: " + e.Message);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ocorreu um erro interno.");
             }
         }
     }

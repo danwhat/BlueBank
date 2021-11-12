@@ -1,17 +1,25 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
 using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
-using System;
 
 namespace Domain.Requests
 {
     public class WithdrawRequest
     {
+        private readonly int _accountNumber;
+
+        private readonly TransactionValueDto _dto;
+
+        private readonly IAccountRepository _accountRepository;
+
+        private readonly ITransactionRepository _transactionRepositoy;
+
         public WithdrawRequest(
             int AccountNumber,
-            TransactionDTO dto,
+            TransactionValueDto dto,
             IAccountRepository accountRepository,
             ITransactionRepository transactionRepository)
         {
@@ -21,18 +29,13 @@ namespace Domain.Requests
             _transactionRepositoy = transactionRepository;
         }
 
-        private readonly int _accountNumber;
-        private readonly TransactionDTO _dto;
-        private readonly IAccountRepository _accountRepository;
-        private readonly ITransactionRepository _transactionRepositoy;
-
         public void Validation()
         {
             Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
             Validations.SufficientBalanceValidation(_accountRepository, _accountNumber, _dto.Value);
         }
 
-        public TransactionResponseDTO Withdraw()
+        public TransactionResponseDto Withdraw()
         {
             Validation();
 
@@ -46,7 +49,7 @@ namespace Domain.Requests
             {
                 Transaction transactionDB = _transactionRepositoy.Create(transaction);
                 Account accAtualizada = _accountRepository.Get(_accountNumber);
-                var transactionResponse = new TransactionResponseDTO
+                var transactionResponse = new TransactionResponseDto
                 {
                     Message = "Saque realizado com sucesso.",
                     OldBalance = acc.Balance,
@@ -56,11 +59,11 @@ namespace Domain.Requests
             }
             catch (ServerException e)
             {
-                throw new ServerException("Deu erro aqui."+ e.Message);
+                throw new Exception("Ocorreu um erro: " + e.Message);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw new Exception("Deu erro aqui." + e.Message);
+                throw new Exception("Ocorreu um erro interno.");
             }
         }
     }

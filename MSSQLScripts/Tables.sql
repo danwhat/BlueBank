@@ -1,0 +1,162 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[People](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](max) NOT NULL,
+	[Address] [nvarchar](max) NULL,
+	[Type] [int] NOT NULL,
+	[Doc] [nvarchar](450) NULL,
+	[UpdatedAt] [datetime2](7) NOT NULL,
+	[IsActive] [bit] NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_People] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_People_Doc] ON [dbo].[People]
+(
+	[Doc] ASC
+)
+WHERE ([Doc] IS NOT NULL)
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[People] ADD  DEFAULT (CONVERT([bit],(1))) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[People] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+
+
+CREATE TABLE [dbo].[Contacts](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PhoneNumber] [nvarchar](max) NULL,
+	[PersonId] [int] NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_Contacts] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_Contacts_PersonId] ON [dbo].[Contacts]
+(
+	[PersonId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Contacts] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Contacts]  WITH CHECK ADD  CONSTRAINT [FK_Contacts_People_PersonId] FOREIGN KEY([PersonId])
+REFERENCES [dbo].[People] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Contacts] CHECK CONSTRAINT [FK_Contacts_People_PersonId]
+GO
+
+
+CREATE TABLE [dbo].[Accounts](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[PersonId] [int] NOT NULL,
+	[IsActive] [bit] NULL,
+	[UpdatedAt] [datetime2](7) NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_Accounts] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_Accounts_PersonId] ON [dbo].[Accounts]
+(
+	[PersonId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Accounts] ADD  DEFAULT (CONVERT([bit],(1))) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Accounts] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Accounts]  WITH CHECK ADD  CONSTRAINT [FK_Accounts_People_PersonId] FOREIGN KEY([PersonId])
+REFERENCES [dbo].[People] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Accounts] CHECK CONSTRAINT [FK_Accounts_People_PersonId]
+GO
+
+
+CREATE TABLE [dbo].[Transactions](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[AccountFromId] [int] NULL,
+	[AccountToId] [int] NULL,
+	[Value] [money] NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_Transactions] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_Transactions_AccountFromId] ON [dbo].[Transactions]
+(
+	[AccountFromId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_Transactions_AccountToId] ON [dbo].[Transactions]
+(
+	[AccountToId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Transactions] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Transactions]  WITH CHECK ADD  CONSTRAINT [FK_Transactions_Accounts_AccountFromId] FOREIGN KEY([AccountFromId])
+REFERENCES [dbo].[Accounts] ([Id])
+GO
+ALTER TABLE [dbo].[Transactions] CHECK CONSTRAINT [FK_Transactions_Accounts_AccountFromId]
+GO
+ALTER TABLE [dbo].[Transactions]  WITH CHECK ADD  CONSTRAINT [FK_Transactions_Accounts_AccountToId] FOREIGN KEY([AccountToId])
+REFERENCES [dbo].[Accounts] ([Id])
+GO
+ALTER TABLE [dbo].[Transactions] CHECK CONSTRAINT [FK_Transactions_Accounts_AccountToId]
+GO
+
+
+CREATE TABLE [dbo].[TransactionLog](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Value] [money] NOT NULL,
+	[BalanceAfter] [money] NOT NULL,
+	[AccountId] [int] NOT NULL,
+	[TransactionId] [int] NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_TransactionLog] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLog_AccountId] ON [dbo].[TransactionLog]
+(
+	[AccountId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_TransactionLog_TransactionId] ON [dbo].[TransactionLog]
+(
+	[TransactionId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[TransactionLog] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[TransactionLog]  WITH CHECK ADD  CONSTRAINT [FK_TransactionLog_Accounts_AccountId] FOREIGN KEY([AccountId])
+REFERENCES [dbo].[Accounts] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[TransactionLog] CHECK CONSTRAINT [FK_TransactionLog_Accounts_AccountId]
+GO
+ALTER TABLE [dbo].[TransactionLog]  WITH CHECK ADD  CONSTRAINT [FK_TransactionLog_Transactions_TransactionId] FOREIGN KEY([TransactionId])
+REFERENCES [dbo].[Transactions] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[TransactionLog] CHECK CONSTRAINT [FK_TransactionLog_Transactions_TransactionId]
+GO

@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
@@ -8,29 +9,32 @@ namespace Domain.Requests
 {
     public class DepositRequest
     {
+        private readonly int _accountNumber;
+
+        private readonly TransactionValueDto _dto;
+
+        private readonly IAccountRepository _accountRepository;
+
+        private readonly ITransactionRepository _transactionRepository;
+
         public DepositRequest(
             int AccountNumber,
-            TransactionDTO dto,
-            IAccountRepository accountRepository, 
+            TransactionValueDto dto,
+            IAccountRepository accountRepository,
             ITransactionRepository transactionRepository)
         {
             _accountNumber = AccountNumber;
-            _dto = dto;                        
+            _dto = dto;
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
         }
-
-        private readonly int _accountNumber;
-        private readonly TransactionDTO _dto;
-        private readonly IAccountRepository _accountRepository;
-        private readonly ITransactionRepository _transactionRepository;
 
         public void Validation()
         {
             Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
         }
-        
-        public TransactionResponseDTO Deposit()
+
+        public TransactionResponseDto Deposit()
         {
             Validation();
 
@@ -44,17 +48,21 @@ namespace Domain.Requests
             {
                 Transaction transactionDB = _transactionRepository.Create(transaction);
                 Account accAtualizada = _accountRepository.Get(_accountNumber);
-                var transactionResponse = new TransactionResponseDTO
+                var transactionResponse = new TransactionResponseDto
                 {
-                    Message = "Deposito realizado com sucesso.",
+                    Message = "Depósito realizado com sucesso.",
                     OldBalance = acc.Balance,
                     CurrentBalance = accAtualizada.Balance
                 };
                 return transactionResponse;
             }
-            catch(Exception e)
+            catch (ServerException e)
             {
-                throw new Exception("Deu erro aqui." + e.Message);
+                throw new Exception("Ocorreu um erro: " + e.Message);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ocorreu um erro interno.");
             }
         }
     }

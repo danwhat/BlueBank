@@ -1,4 +1,6 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
+using Domain.Core.Exceptions;
 using Domain.Core.Interfaces;
 using Domain.Entities;
 using Domain.Services.Validations;
@@ -7,41 +9,55 @@ namespace Domain.Requests
 {
     public class CreateContactRequest
     {
+        private readonly int _accountNumber;
+
+        private readonly ContactDto _contact;
+
+        private readonly IAccountRepository _accountRepository;
+
+        private readonly IPersonRepository _personRepository;
+
         public CreateContactRequest(
             int accountNumber,
-            PersonRequestDto phone,
+            ContactDto contact,
             IPersonRepository personRepository,
             IAccountRepository accountRepository)
         {
             _accountNumber = accountNumber;
-            _phone = phone;
+            _contact = contact;
             _accountRepository = accountRepository;
             _personRepository = personRepository;
         }
 
-        private readonly int _accountNumber;
-        private readonly PersonRequestDto _phone;
-        private readonly IAccountRepository _accountRepository;
-        private readonly IPersonRepository _personRepository;
-
         public void Validation()
         {
-            Validations.PhoneNumberValidation(_phone.PhoneNumber);
+            Validations.PhoneNumberValidation(_contact.PhoneNumber);
             Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
             var acc = _accountRepository.Get(_accountNumber);
-            Validations.ThisPersonHasNotThatPhoneNumberValidation(_phone.PhoneNumber, acc.Person);
+            Validations.ThisPersonHasNotThatPhoneNumberValidation(_contact.PhoneNumber, acc.Person);
         }
 
-        public PersonResponseDto Create()
+        public ContactResponseDto Create()
         {
             Validation();
 
-            var doc = _accountRepository.Get(_accountNumber).Person.Doc;
+            try
+            {
+                var doc = _accountRepository.Get(_accountNumber).Person.Doc;
 
-            Person currentPerson = _personRepository.AddContact(doc, _phone.PhoneNumber);
-            PersonResponseDto response = new(currentPerson, _accountNumber);
+                Person currentPerson = _personRepository.AddContact(doc, _contact.PhoneNumber);
+                ContactResponseDto response = new(currentPerson, _accountNumber);
 
-            return response;
+                return response;
+            }
+            catch (ServerException e)
+            {
+                throw new Exception("Ocorreu um erro: " + e.Message);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Ocorreu um erro interno.");
+            }
         }
     }
 }

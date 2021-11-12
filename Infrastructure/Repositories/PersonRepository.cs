@@ -18,11 +18,12 @@ namespace Infrastructure.Repositories
         }
 
         #region Interface methods
+
         public Domain.Entities.Person Update(string doc, Domain.Entities.Person updatePerson)
         {
             int personType = GetPerson.Type(updatePerson);
             if (personType == 0) throw new ServerException(Error.PersonInvalidType);
-            
+
             if (doc != updatePerson.Doc)
             {
                 var dbPersonNewDoc = GetPerson.ByDocsOrDefault(updatePerson.Doc, _context);
@@ -35,7 +36,7 @@ namespace Infrastructure.Repositories
             dbPerson.Address = updatePerson.Address;
             dbPerson.Doc = updatePerson.Doc;
             dbPerson.UpdatedAt = DateTime.Now;
-            
+
             try
             {
                 _context.People.Update(dbPerson);
@@ -55,7 +56,7 @@ namespace Infrastructure.Repositories
         public Domain.Entities.Person Get(string doc)
         {
             var dbPerson = GetPerson.ByDocsIfActive(doc, _context);
-            
+
             return (dbPerson.Type == 1)
                 ? BuildInstance.NaturalPerson(dbPerson)
                 : BuildInstance.LegalPerson(dbPerson);
@@ -70,14 +71,16 @@ namespace Infrastructure.Repositories
                 _context.Contacts
                     .RemoveRange(
                         _context.Contacts.Where(contact => contact.PersonId == dbPerson.Id));
-                
+
                 dbPerson.Contacts = list
-                    .Select(phoneNumber => new Contact {
+                    .Select(phoneNumber => new Contact
+                    {
                         Person = dbPerson,
-                        PhoneNumber = phoneNumber })
+                        PhoneNumber = phoneNumber
+                    })
                     .ToList();
                 dbPerson.UpdatedAt = DateTime.Now;
-                
+
                 _context.People.Update(dbPerson);
                 _context.SaveChanges();
 
@@ -101,9 +104,8 @@ namespace Infrastructure.Repositories
                 var contact = _context.Contacts
                     .Where(curr => curr.PersonId == dbPerson.Id && curr.PhoneNumber == phoneNumber)
                     .FirstOrDefault<Contact>();
-                if (contact == null) return (dbPerson.Type == 1)
-                    ? BuildInstance.NaturalPerson(dbPerson)
-                    : BuildInstance.LegalPerson(dbPerson);
+
+                if (contact == null) throw new ServerException(Error.ContactNotFound);
 
                 _context.Contacts.Remove(contact);
                 _context.SaveChanges();
@@ -147,9 +149,11 @@ namespace Infrastructure.Repositories
                 throw new ServerException(Error.PersonUpdateFail);
             }
         }
-        #endregion
+
+        #endregion Interface methods
 
         #region Extra methods
+
         public Domain.Entities.Person Create(Domain.Entities.Person person)
         {
             int personType = GetPerson.Type(person);
@@ -177,6 +181,7 @@ namespace Infrastructure.Repositories
 
             return person;
         }
-        #endregion
+
+        #endregion Extra methods
     }
 }

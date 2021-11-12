@@ -19,7 +19,6 @@ namespace Infrastructure.Repositories
 
         public Domain.Entities.Transaction Create(Domain.Entities.Transaction transaction)
         {
-
             if (
                 transaction?.AccountFrom?.AccountNumber < 1
                 && transaction?.AccountTo?.AccountNumber < 1
@@ -113,6 +112,7 @@ namespace Infrastructure.Repositories
         }
 
         #region Helpers
+
         private void HandleTransaction(Domain.Entities.Transaction transaction)
         {
             if (transaction.Value <= 0) return;
@@ -132,7 +132,6 @@ namespace Infrastructure.Repositories
             {
                 Deposit(transaction);
             }
-
         }
 
         private void Transfer(Domain.Entities.Transaction transaction)
@@ -140,7 +139,7 @@ namespace Infrastructure.Repositories
             var accountFrom = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
             if (accountFrom == null) throw new ServerException(Error.AccountFromNotFound);
 
-            var accountTo = GetAccount.IfActiveById(transaction.AccountFrom.AccountNumber, _context);
+            var accountTo = GetAccount.IfActiveById(transaction.AccountTo.AccountNumber, _context);
             if (accountTo == null) throw new ServerException(Error.AccountToNotFound);
 
             var accountFromLogs = (ICollection<TransactionLog>)_context
@@ -153,7 +152,7 @@ namespace Infrastructure.Repositories
 
             var accountToLogs = (ICollection<TransactionLog>)_context
                 .TransactionLog
-                .Where(log => log.AccountId == accountFrom.Id)
+                .Where(log => log.AccountId == accountTo.Id)
                 .ToList();
 
             decimal accountToBalance = (GetBalance.Current(accountToLogs));
@@ -164,7 +163,6 @@ namespace Infrastructure.Repositories
                 AccountTo = accountTo,
                 Value = transaction.Value,
             };
-
 
             var transactionLogFrom = new TransactionLog()
             {
@@ -213,7 +211,6 @@ namespace Infrastructure.Repositories
                 AccountFrom = account,
                 Value = transaction.Value,
             };
-
 
             var transactionLog = new TransactionLog()
             {
@@ -283,7 +280,7 @@ namespace Infrastructure.Repositories
                         && (transaction.CreatedAt >= initial && transaction.CreatedAt <= final))
                     .OrderBy(transaction => transaction.CreatedAt).ToList();
         }
-           
-        #endregion
+
+        #endregion Helpers
     }
 }
