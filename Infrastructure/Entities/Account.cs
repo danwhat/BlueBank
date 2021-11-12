@@ -8,11 +8,10 @@ namespace Infrastructure
     {
         public int PersonId { get; set; }
         public Person Person { get; set; }
-        public List<TransactionLog> TransactionLogs { get; set; }
-        public List<Transaction> TransactionsFrom { get; set; }
-        public List<Transaction> TransactionsTo { get; set; }
-        public bool? IsActive { get; set; }        
+        public ICollection<TransactionLog> TransactionLogs { get; set; }
+        public ICollection<Transaction> TransactionsFrom { get; set; }
+        public ICollection<Transaction> TransactionsTo { get; set; }
+        public bool? IsActive { get; set; }
         public DateTime UpdatedAt { get; internal set; }
-
     }
 }

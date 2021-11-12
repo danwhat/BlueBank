@@ -1,11 +1,9 @@
-﻿using System;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Context.Configurations
 {
-    class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
+    internal class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {

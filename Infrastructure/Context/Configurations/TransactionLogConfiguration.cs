@@ -1,11 +1,9 @@
-﻿using System;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Context.Configurations
 {
-    class TransactionLogConfiguration : IEntityTypeConfiguration<TransactionLog>
+    internal class TransactionLogConfiguration : IEntityTypeConfiguration<TransactionLog>
     {
         public void Configure(EntityTypeBuilder<TransactionLog> builder)
         {

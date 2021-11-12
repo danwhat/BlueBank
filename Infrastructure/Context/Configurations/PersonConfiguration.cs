@@ -1,11 +1,9 @@
-﻿using System;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Context.Configurations
 {
-    class PersonConfiguration : IEntityTypeConfiguration<Person>
+    internal class PersonConfiguration : IEntityTypeConfiguration<Person>
     {
         public void Configure(EntityTypeBuilder<Person> builder)
         {
@@ -24,7 +22,6 @@ namespace Infrastructure.Context.Configurations
             builder
                 .Property(person => person.UpdatedAt)
                 .HasDefaultValue(null);
-
         }
     }
 }

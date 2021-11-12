@@ -1,5 +1,4 @@
-﻿using System;
-using Infrastructure.Entities;
+﻿using Infrastructure.Entities;
 
 namespace Infrastructure
 {
@@ -7,6 +6,6 @@ namespace Infrastructure
     {
         public string PhoneNumber { get; set; }
         public int PersonId { get; set; }
-        public Person Person { get; set; }        
+        public Person Person { get; set; }
     }
 }
