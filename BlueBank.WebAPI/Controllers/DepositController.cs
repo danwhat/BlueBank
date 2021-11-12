@@ -1,8 +1,8 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
 using Domain.Core.Interfaces;
 using Domain.Requests;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace BlueBank.WebAPI.Controllers
 {
@@ -20,7 +20,7 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost("{accountNumber}")]
-        public ObjectResult Deposit(int accountNumber, [FromBody] TransactionDTO transation)
+        public ObjectResult Deposit(int accountNumber, [FromBody] TransactionValueDto transation)
         {
             try
             {

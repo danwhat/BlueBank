@@ -1,8 +1,8 @@
-﻿using Domain.Core.DTOs;
+﻿using System;
+using Domain.Core.DTOs;
 using Domain.Core.Interfaces;
 using Domain.Requests;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace BlueBank.WebAPI.Controllers
 {
@@ -20,7 +20,7 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost("{accountNumber}")]
-        public ObjectResult CreateContact(int accountNumber, [FromBody] PersonRequestDto phone)
+        public ObjectResult CreateContact(int accountNumber, [FromBody] ContactDto phone)
         {
             try
             {
@@ -30,14 +30,14 @@ namespace BlueBank.WebAPI.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Mensagem de erro:" + e.Message);
+                return BadRequest("Mensagem de erro: " + e.Message);
             }
         }
 
         [HttpDelete("{document}")]
         public ObjectResult DeleteContact(string document, [FromBody] ContactDto contactDto)
         {
-            var request = new DeleteContactRequest(document, contactDto.PhoneNumber, _personRepository);
+            var request = new DeleteContactRequest(document, contactDto.PhoneNumber, _personRepository, _accountRepository);
             try
             {
                 var result = request.Delete();
@@ -45,8 +45,8 @@ namespace BlueBank.WebAPI.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("Mensagem de erro:" + e.Message);
+                return BadRequest("Mensagem de erro: " + e.Message);
             }
         }
-    }    
+    }
 }

@@ -18,7 +18,7 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost]
-        public ObjectResult CreateAccount([FromBody] AccountDto dto)
+        public ObjectResult CreateAccount([FromBody] CreateAccountDto dto)
         {
             try
             {
@@ -30,7 +30,6 @@ namespace BlueBank.WebAPI.Controllers
             {
                 return BadRequest("Mensagem de erro:" + e.Message);
             }
-
         }
 
         //[HttpPut]
@@ -79,5 +78,5 @@ namespace BlueBank.WebAPI.Controllers
                 return BadRequest("Mensagem de erro:" + e.Message);
             }
         }
-    }    
+    }
 }

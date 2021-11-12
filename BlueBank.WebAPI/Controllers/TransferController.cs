@@ -20,7 +20,7 @@ namespace BlueBank.WebAPI.Controllers
         }
 
         [HttpPost("{accountNumber}")]
-        public ObjectResult Transfer(int accountNumber, [FromBody] TransactionDTO transation)
+        public ObjectResult Transfer(int accountNumber, [FromBody] TransactionDto transation)
         {
             try
             {
