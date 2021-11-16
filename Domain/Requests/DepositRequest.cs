@@ -32,6 +32,8 @@ namespace Domain.Requests
         public void Validation()
         {
             Validations.ThisAccountExistsValidation(_accountRepository, _accountNumber);
+            if (_dto.Value < 0) throw new InvalidInputException("Valor Negativo Inválido.");
+
         }
 
         public TransactionResponseDto Deposit()

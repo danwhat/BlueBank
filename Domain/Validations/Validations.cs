@@ -24,6 +24,10 @@ namespace Domain.Services.Validations
 
         public static void PhoneNumberValidation(string phoneNumber)
         {
+            if (string.IsNullOrEmpty(phoneNumber))
+                throw new InvalidInputException("Número de telefone deve ser preenchido.");
+
+
             var phoneNumberOnlyNumbers = phoneNumber
                 .Replace("(", string.Empty)
                 .Replace(")", string.Empty)
@@ -85,6 +89,7 @@ namespace Domain.Services.Validations
 
         public static void SufficientBalanceValidation(IAccountRepository accountRepository, int accountNumber, Decimal value)
         {
+            if (value < 0) throw new InvalidInputException("Valor Negativo Inválido.");
             Account acc = accountRepository.Get(accountNumber);
             if (acc.Balance < value) throw new InvalidInputException("Saldo insuficiente.");
         }
